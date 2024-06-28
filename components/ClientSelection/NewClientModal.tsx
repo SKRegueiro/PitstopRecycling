@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Keyboard, Platform, StyleSheet, View } from "react-native";
 import { Button, Dialog, PanningProvider, TextField } from "react-native-ui-lib";
 import { Text } from "@rneui/base";
 import { AntDesign } from "@expo/vector-icons";
@@ -26,13 +26,34 @@ const NewClientModal = ({
     abn: "",
     address: ""
   });
-  console.log("hola");
+
+  const [bottom, setBottom] = React.useState(0);
+
+  //TODO: should be a better way
+  React.useEffect(() => {
+    function onKeyboardChange(e: any) {
+      if (e.endCoordinates.screenY < e.startCoordinates.screenY) setBottom(e.endCoordinates.height / 2);
+      else setBottom(0);
+    }
+
+    if (Platform.OS === "ios") {
+      const subscription = Keyboard.addListener("keyboardWillChangeFrame", onKeyboardChange);
+      return () => subscription.remove();
+    }
+
+    const subscriptions = [
+      Keyboard.addListener("keyboardDidHide", onKeyboardChange),
+      Keyboard.addListener("keyboardDidShow", onKeyboardChange)
+    ];
+    return () => subscriptions.forEach((subscription) => subscription.remove());
+  }, []);
+
   return (
     <View>
       <Dialog
         visible={isVisible}
         onDismiss={onClose}
-        containerStyle={styles.dialog}
+        containerStyle={{ ...styles.dialog, bottom }}
         panDirection={PanningProvider.Directions.DOWN}
         useSafeArea
       >
@@ -80,10 +101,7 @@ const NewClientModal = ({
               clientInfo.name === "" || clientInfo.email === "" || clientInfo.abn === "" || clientInfo.address === ""
             }
             iconSource={() => <AntDesign style={{ paddingLeft: 10 }} name="check" size={20} color="white" />}
-            onPress={() => {
-              console.log(clientInfo);
-              onSaveClient(clientInfo);
-            }}
+            onPress={() => onSaveClient(clientInfo)}
           />
         </View>
       </Dialog>

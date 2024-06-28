@@ -32,7 +32,7 @@ export default function Home() {
             },
             { text: "wix.to/A465c", text90: true, $textDisabled: true }
           ]}
-        ></Card.Section>
+        />
       </Card>
       <View style={styles.buttons}>
         <View style={{ width: "100%", justifyContent: "space-between", flexDirection: "row" }}>
@@ -47,7 +47,7 @@ export default function Home() {
           ></Button>
           <Button
             // icon="arrow-down"
-            onPress={() => console.log("Pressed")}
+            onPress={() => router.navigate("/fuel")}
             label={"⛽️Fuel"}
             size={ButtonSize.small}
             enableShadow
@@ -73,6 +73,7 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   card: {
+    marginTop: 20,
     height: "30%",
     width: "100%",
     backgroundColor: "#fff"

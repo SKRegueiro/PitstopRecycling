@@ -1,54 +1,80 @@
-import { StatusBar } from "expo-status-bar";
-import { Platform, StyleSheet } from "react-native";
-import { Text, View } from "@/components/Themed";
-import { Button, TextInput } from "react-native-paper";
+import { Alert } from "react-native";
 import { useState } from "react";
+import useProfile from "@/lib/hooks/useProfile";
+import ClientSelection from "@/components/ClientSelection";
+import InputTyres from "@/components/InputTyres";
+import SingPickUp from "@/components/SingPickUp";
+import { router } from "expo-router";
+import insertPickUp from "@/services/pickups/insertPickUp";
 
-export default function ModalScreen() {
-  const [tyres, setTyres] = useState<string>("");
+export type TyresType = {
+  id: string;
+  quantity: string;
+  type: string;
+};
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>PickUp</Text>
+const TYRE_PAGE = 0;
+const CLIENT_PAGE = 1;
+const SIGNATURE_PAGE = 2;
 
-      <Text>How many tires do you have?</Text>
-      <TextInput
-        placeholder={"Enter number here"}
-        keyboardType="numeric"
-        autoFocus={true}
-        onChangeText={(value) => setTyres(value)}
-        value={tyres}
+export default function PickUpScreen() {
+  const [tyres, setTyres] = useState<TyresType[]>([]);
+  const [selectedClientId, setSelectedClientId] = useState<number | undefined>();
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const { profile } = useProfile();
+
+  //TODO: store signature. Create bill. Send email. store pick up.
+  const onSubmit = async () => {
+    try {
+      setLoading(true);
+      const updates = {
+        employeeId: profile?.id,
+        clientId: selectedClientId,
+        tyres: tyres.map((item) => ({
+          [item.type]: Number(item.quantity)
+        }))
+      };
+
+      const { error } = await insertPickUp(updates);
+
+      if (error) Alert.alert(error.message);
+      //TODO: change for a toast
+      Alert.alert("Pick up successfully created");
+
+      router.navigate("/");
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        Alert.alert(error.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (currentPage === TYRE_PAGE) {
+    return (
+      <InputTyres
+        tyres={tyres}
+        onTyresChange={(value) => setTyres(value)}
+        goNext={() => setCurrentPage(currentPage + 1)}
       />
-      <StatusBar style="auto" />
-      <Button
-        disabled={!tyres}
-        onPress={() => alert(tyres)}
-        icon={"send"}
-        mode={"contained"}
-        contentStyle={{ flexDirection: "row-reverse" }}
-      >
-        Confirm
-      </Button>
-
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold"
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%"
+    );
   }
-});
+
+  if (currentPage === CLIENT_PAGE) {
+    return (
+      <ClientSelection
+        goBack={() => setCurrentPage(currentPage - 1)}
+        goNext={() => setCurrentPage(currentPage + 1)}
+        selectedClient={selectedClientId}
+        onSelectClient={setSelectedClientId}
+      />
+    );
+  }
+
+  if (currentPage === SIGNATURE_PAGE) {
+    return <SingPickUp text={"hey"} onOK={(value) => onSubmit()} />;
+  }
+}

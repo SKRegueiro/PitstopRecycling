@@ -1,4 +1,4 @@
-import { FlatList, Platform, StyleSheet } from "react-native";
+import { FlatList, Keyboard, Platform, StyleSheet } from "react-native";
 import { Text, View } from "@/components/Themed";
 import { Button, Picker, TextField } from "react-native-ui-lib";
 import { StatusBar } from "expo-status-bar";
@@ -17,6 +17,7 @@ export default function InputTyres({ tyres, onTyresChange, goNext }: Props) {
   const [tireType, setTireType] = useState<string>("Passenger");
 
   const onAddItem = () => {
+    Keyboard.dismiss();
     onTyresChange([...tyres, { id: String(tyres.length + 1), quantity: tireQuantity, type: tireType }]);
     setTireQuantity("");
     setTireType("");
