@@ -104,6 +104,8 @@ export type Database = {
           created_at: string
           employeeId: number
           id: number
+          site: number | null
+          status: string
           tyres: Json | null
         }
         Insert: {
@@ -111,6 +113,8 @@ export type Database = {
           created_at?: string
           employeeId: number
           id?: number
+          site?: number | null
+          status?: string
           tyres?: Json | null
         }
         Update: {
@@ -118,6 +122,8 @@ export type Database = {
           created_at?: string
           employeeId?: number
           id?: number
+          site?: number | null
+          status?: string
           tyres?: Json | null
         }
         Relationships: [
@@ -135,7 +141,35 @@ export type Database = {
             referencedRelation: "employees"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "pickups_site_fkey"
+            columns: ["site"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      sites: {
+        Row: {
+          address: string
+          created_at: string
+          id: number
+          type: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          id?: number
+          type: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          id?: number
+          type?: string
+        }
+        Relationships: []
       }
     }
     Views: {

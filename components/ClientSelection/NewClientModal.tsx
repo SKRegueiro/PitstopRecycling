@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Keyboard, Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Button, Dialog, PanningProvider, TextField } from "react-native-ui-lib";
 import { Text } from "@rneui/base";
 import { AntDesign } from "@expo/vector-icons";
+import useMoveOnKeyboardOpen from "@/lib/hooks/useMoveOnKeyboardOpen";
 
 type ClientProps = {
   name: string;
@@ -20,33 +21,13 @@ const NewClientModal = ({
   onClose: () => void;
   onSaveClient: (props: ClientProps) => void;
 }) => {
+  const { bottom } = useMoveOnKeyboardOpen();
   const [clientInfo, setClientInfo] = useState<ClientProps>({
     name: "",
     email: "",
     abn: "",
     address: ""
   });
-
-  const [bottom, setBottom] = React.useState(0);
-
-  //TODO: should be a better way
-  React.useEffect(() => {
-    function onKeyboardChange(e: any) {
-      if (e.endCoordinates.screenY < e.startCoordinates.screenY) setBottom(e.endCoordinates.height / 2);
-      else setBottom(0);
-    }
-
-    if (Platform.OS === "ios") {
-      const subscription = Keyboard.addListener("keyboardWillChangeFrame", onKeyboardChange);
-      return () => subscription.remove();
-    }
-
-    const subscriptions = [
-      Keyboard.addListener("keyboardDidHide", onKeyboardChange),
-      Keyboard.addListener("keyboardDidShow", onKeyboardChange)
-    ];
-    return () => subscriptions.forEach((subscription) => subscription.remove());
-  }, []);
 
   return (
     <View>

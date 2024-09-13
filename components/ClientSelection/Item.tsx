@@ -29,7 +29,8 @@ const Item = ({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        paddingTop: 20
+        paddingTop: 20,
+        height: "auto"
       }}
     >
       <View

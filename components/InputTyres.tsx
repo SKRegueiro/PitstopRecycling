@@ -5,6 +5,8 @@ import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import { TyresType } from "@/app/pickUp";
 import { Stack } from "expo-router";
+import useMoveOnKeyboardOpen from "@/lib/hooks/useMoveOnKeyboardOpen";
+import { AntDesign } from "@expo/vector-icons";
 
 type Props = {
   tyres: TyresType[];
@@ -15,47 +17,67 @@ type Props = {
 export default function InputTyres({ tyres, onTyresChange, goNext }: Props) {
   const [tireQuantity, setTireQuantity] = useState<string>("");
   const [tireType, setTireType] = useState<string>("Passenger");
+  const { bottom } = useMoveOnKeyboardOpen();
 
   const onAddItem = () => {
     Keyboard.dismiss();
-    onTyresChange([...tyres, { id: String(tyres.length + 1), quantity: tireQuantity, type: tireType }]);
+
+    const existingTyreIndex = tyres.findIndex((tyre) => tyre.type === tireType);
+
+    if (existingTyreIndex !== -1) {
+      const updatedTyres = [...tyres];
+      updatedTyres[existingTyreIndex].quantity =
+        Number(updatedTyres[existingTyreIndex].quantity) + parseInt(tireQuantity);
+
+      onTyresChange(updatedTyres);
+    } else {
+      const newTyre = { id: tyres.length + 1, quantity: parseInt(tireQuantity), type: tireType };
+
+      onTyresChange([...tyres, newTyre]);
+    }
+
     setTireQuantity("");
     setTireType("");
   };
 
-  const onRemoveItem = (id: string) => {
+  const onRemoveItem = (id: number) => {
     onTyresChange(tyres.filter((item) => item.id !== id));
   };
 
   return (
-    <View style={styles.container}>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          title: "Pick up",
-          headerTitleAlign: "center",
-          headerTitle: (props) => <Text style={{ fontSize: 15, fontWeight: "bold" }}>Pick up</Text>,
-          headerRight: () => null
-        }}
-      />
-      <Text style={styles.title}>How many tyres do you have?</Text>
+    <View style={{ ...styles.container, bottom }}>
       <View>
-        <FlatList
-          style={{ width: "100%", paddingTop: 30 }}
-          data={tyres}
-          renderItem={({ item }) => (
-            <Item id={item.id} quantity={item.quantity} type={item.type} onRemove={onRemoveItem} />
-          )}
-          keyExtractor={(item) => item.id}
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            title: "Pick up",
+            headerTitleAlign: "center",
+            headerTitle: () => <Text style={{ fontSize: 15, fontWeight: "bold" }}>Pick up</Text>,
+            headerRight: () => null
+          }}
         />
+        <Text style={styles.title}>How many tyres do you have?</Text>
+        <View>
+          <FlatList
+            style={{ width: "100%", paddingTop: 50 }}
+            data={tyres}
+            renderItem={({ item }) => (
+              <Item id={item.id} quantity={item.quantity} type={item.type} onRemove={onRemoveItem} />
+            )}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        </View>
 
         <View style={styles.input}>
           <View style={styles.textField}>
             <TextField
               placeholder={"Quantity"}
               keyboardType="numeric"
+              style={{ minWidth: "15%", color: "black" }}
               onChangeText={(value) => setTireQuantity(value)}
+              placeholderTextColor={"#A9A9AC"}
               value={tireQuantity}
+              returnKeyType={"done"}
             />
 
             <Picker
@@ -64,6 +86,7 @@ export default function InputTyres({ tyres, onTyresChange, goNext }: Props) {
               placeholder={"Type"}
               fieldType={"filter"}
               useWheelPicker
+              onPress={() => Keyboard.dismiss()}
               onChange={(value: any) => {
                 setTireType(value);
               }}
@@ -100,25 +123,24 @@ const Item = ({
   type,
   onRemove
 }: {
-  id: string;
-  quantity: string;
+  id: number;
+  quantity: number;
   type: string;
-  onRemove: (id: string) => void;
+  onRemove: (id: number) => void;
 }) => (
   <View style={styles.item}>
     <View style={styles.counter}>
       <Text style={styles.title}>{quantity}</Text>
       <Text style={styles.title}>{type}</Text>
     </View>
-    <Text style={{ fontSize: 20 }} onPress={() => onRemove(id)}>
-      X
-    </Text>
+    <AntDesign onPress={() => onRemove(id)} name="closecircleo" size={24} color="black" />
   </View>
 );
 
 const styles = StyleSheet.create({
   container: {
-    padding: 15,
+    paddingTop: 20,
+    padding: 10,
     height: "100%"
   },
   counter: {
@@ -147,6 +169,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16
   },
   input: {
+    color: "black !important",
     display: "flex",
     overflow: "hidden",
     borderColor: "black",

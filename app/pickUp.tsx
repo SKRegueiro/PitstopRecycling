@@ -6,10 +6,15 @@ import InputTyres from "@/components/InputTyres";
 import SingPickUp from "@/components/SingPickUp";
 import { router } from "expo-router";
 import insertPickUp from "@/services/pickups/insertPickUp";
+import { LoaderScreen } from "react-native-ui-lib";
+import Colors from "@/constants/Colors";
+import Toast from "react-native-toast-message";
+import useGetClients from "@/lib/hooks/useGetClients";
+import Routes from "@/constants/Routes";
 
 export type TyresType = {
-  id: string;
-  quantity: string;
+  id: number;
+  quantity: number;
   type: string;
 };
 
@@ -23,30 +28,40 @@ export default function PickUpScreen() {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const { profile } = useProfile();
+  const { clients } = useGetClients();
 
   //TODO: store signature. Create bill. Send email. store pick up.
   const onSubmit = async () => {
     try {
       setLoading(true);
+
       const updates = {
         employeeId: profile?.id,
         clientId: selectedClientId,
         tyres: tyres.map((item) => ({
-          [item.type]: Number(item.quantity)
+          type: item.type,
+          quantity: item.quantity
         }))
       };
 
       const { error } = await insertPickUp(updates);
 
       if (error) Alert.alert(error.message);
-      //TODO: change for a toast
-      Alert.alert("Pick up successfully created");
 
-      router.navigate("/");
+      Toast.show({
+        type: "success",
+        text1: "Success!",
+        text2: "Pick up successfully created ✅"
+      });
+
+      router.navigate(Routes.Home);
     } catch (error) {
-      console.log(error);
       if (error instanceof Error) {
-        Alert.alert(error.message);
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: error.message
+        });
       }
     } finally {
       setLoading(false);
@@ -74,7 +89,18 @@ export default function PickUpScreen() {
     );
   }
 
-  if (currentPage === SIGNATURE_PAGE) {
-    return <SingPickUp text={"hey"} onOK={(value) => onSubmit()} />;
+  if (currentPage === SIGNATURE_PAGE && selectedClientId) {
+    return (
+      <SingPickUp
+        selectedClient={clients?.find((client) => (client.id = selectedClientId))}
+        tyres={tyres}
+        //todo: upload signature
+        onOK={(value) => onSubmit()}
+      />
+    );
+  }
+
+  if (loading) {
+    return <LoaderScreen message={"Message goes here"} color={Colors.light.background} />;
   }
 }

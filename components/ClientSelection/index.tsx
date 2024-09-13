@@ -85,6 +85,7 @@ const ClientSelection = ({
           )
         }}
       />
+
       <SearchBar
         containerStyle={{ borderRadius: 30 }}
         inputContainerStyle={{ borderRadius: 30 }}
@@ -112,6 +113,7 @@ const ClientSelection = ({
           onPress={() => goNext()}
         />
       </View>
+
       <NewClientModal isVisible={showModal} onClose={() => setShowModal(false)} onSaveClient={onSaveClient} />
     </View>
   );

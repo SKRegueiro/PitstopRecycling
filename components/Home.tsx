@@ -1,70 +1,78 @@
 import { StyleSheet } from "react-native";
 import React from "react";
-import { Button, ButtonSize, Card, View } from "react-native-ui-lib";
+import { Button, ButtonSize, Text, View } from "react-native-ui-lib";
 import { router, Stack } from "expo-router";
+import { FontAwesome5, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import useInTransitPickUps from "@/lib/hooks/useInTransitPickUps";
+import Card from "@/components/Card";
+import useProfile from "@/lib/hooks/useProfile";
+import Routes from "@/constants/Routes";
+import { useFocusEffect } from "@react-navigation/core";
 
 export default function Home() {
+  const { haveInTransitPickUps, tyresByType, refetch } = useInTransitPickUps();
+  const { profile } = useProfile();
+
+  useFocusEffect(() => {
+    refetch();
+  });
+
   return (
     <View style={styles.container} useSafeArea>
       <Stack.Screen
         options={{
           title: "Home",
-          headerStyle: { backgroundColor: "white" },
-          headerTintColor: "black",
-          headerTitleStyle: {
-            fontWeight: "bold"
-          }
+          headerRight: () => <FontAwesome5 name="clock" size={24} color="black" />
         }}
       />
-
-      <Card enableShadow height={"30%"} width={"30%"} style={styles.card} onPress={() => console.log("pressed")}>
-        <Card.Section
-          content={[{ text: "Card content here", text70: true, grey10: true }]}
-          contentStyle={{ alignItems: "center" }}
-        />
-        <Card.Section
-          content={[
-            { text: "Sergio", text90: true, $textDefault: true },
-            {
-              text: "",
-              text80: true,
-              $textDefault: true
-            },
-            { text: "wix.to/A465c", text90: true, $textDisabled: true }
-          ]}
-        />
+      <Card>
+        <Text text30R>{profile?.name}</Text>
+        {haveInTransitPickUps ? (
+          <View>
+            <Text>Current load:</Text>
+            <Text>{Object.keys(tyresByType!).map((key) => `\n${[key]}: ${tyresByType[key]} `)}</Text>
+          </View>
+        ) : (
+          <View>
+            <Text> Empty truck</Text>
+          </View>
+        )}
+        <View></View>
       </Card>
       <View style={styles.buttons}>
         <View style={{ width: "100%", justifyContent: "space-between", flexDirection: "row" }}>
           <Button
-            // icon="arrow-down"
-            onPress={() => console.log("Pressed")}
-            label={"⬇️ Drop off"}
+            iconSource={() => <MaterialIcons name="download" size={24} color="white" style={{ marginRight: 10 }} />}
+            onPress={() => router.navigate(Routes.DropOff)}
+            label={"Drop off"}
             size={ButtonSize.large}
+            style={{ height: 80 }}
             enableShadow
             borderRadius={5}
-            iconOnRight
-          ></Button>
+            disabled={!haveInTransitPickUps}
+          />
           <Button
-            // icon="arrow-down"
-            onPress={() => router.navigate("/fuel")}
-            label={"⛽️Fuel"}
+            iconSource={() => (
+              <MaterialCommunityIcons style={{ marginRight: 10 }} name="fuel" size={24} color="white" />
+            )}
+            onPress={() => router.navigate(Routes.Fuel)}
+            label={"Fuel"}
+            style={{ height: 80 }}
             size={ButtonSize.small}
             enableShadow
             borderRadius={5}
-            iconOnRight
-          ></Button>
+          />
         </View>
         <View>
           <Button
+            iconSource={() => <FontAwesome5 name="truck-loading" size={20} style={{ marginRight: 10 }} color="white" />}
             style={styles.bigButton}
-            onPress={() => router.navigate("/pickUp")}
-            label={"⬆️ Pick up"}
+            onPress={() => router.navigate(Routes.PickUp)}
+            label={"Pick up"}
             borderRadius={5}
             size={ButtonSize.large}
             enableShadow
-            iconOnRight
-          ></Button>
+          />
         </View>
       </View>
     </View>
@@ -89,7 +97,7 @@ const styles = StyleSheet.create({
     marginBottom: 60,
     gap: 20
   },
-  bigButton: { width: "100%" },
+  bigButton: { width: "100%", height: 80 },
   separator: {
     marginVertical: 30,
     height: 1,
