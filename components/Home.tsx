@@ -1,21 +1,22 @@
 import { StyleSheet } from "react-native";
-import React from "react";
-import { Button, ButtonSize, Text, View } from "react-native-ui-lib";
-import { router, Stack } from "expo-router";
+import React, { useCallback } from "react";
+import { Button, ButtonSize, View } from "react-native-ui-lib";
+import { router, Stack, useFocusEffect } from "expo-router";
 import { FontAwesome5, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import useInTransitPickUps from "@/lib/hooks/useInTransitPickUps";
-import Card from "@/components/Card";
 import useProfile from "@/lib/hooks/useProfile";
 import Routes from "@/constants/Routes";
-import { useFocusEffect } from "@react-navigation/core";
+import StatsCard from "@/components/StatCard";
 
 export default function Home() {
   const { haveInTransitPickUps, tyresByType, refetch } = useInTransitPickUps();
   const { profile } = useProfile();
 
-  useFocusEffect(() => {
-    refetch();
-  });
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
   return (
     <View style={styles.container} useSafeArea>
@@ -25,20 +26,8 @@ export default function Home() {
           headerRight: () => <FontAwesome5 name="clock" size={24} color="black" />
         }}
       />
-      <Card>
-        <Text text30R>{profile?.name}</Text>
-        {haveInTransitPickUps ? (
-          <View>
-            <Text>Current load:</Text>
-            <Text>{Object.keys(tyresByType!).map((key) => `\n${[key]}: ${tyresByType[key]} `)}</Text>
-          </View>
-        ) : (
-          <View>
-            <Text> Empty truck</Text>
-          </View>
-        )}
-        <View></View>
-      </Card>
+      <StatsCard name={profile?.name} haveInTransitPickUps={haveInTransitPickUps} tyresByType={tyresByType} />
+
       <View style={styles.buttons}>
         <View style={{ width: "100%", justifyContent: "space-between", flexDirection: "row" }}>
           <Button
@@ -46,7 +35,7 @@ export default function Home() {
             onPress={() => router.navigate(Routes.DropOff)}
             label={"Drop off"}
             size={ButtonSize.large}
-            style={{ height: 80 }}
+            style={{ width: "45%", height: 80 }}
             enableShadow
             borderRadius={5}
             disabled={!haveInTransitPickUps}
@@ -56,9 +45,9 @@ export default function Home() {
               <MaterialCommunityIcons style={{ marginRight: 10 }} name="fuel" size={24} color="white" />
             )}
             onPress={() => router.navigate(Routes.Fuel)}
-            label={"Fuel"}
-            style={{ height: 80 }}
-            size={ButtonSize.small}
+            label={"Log fuel"}
+            style={{ width: "45%", height: 80 }}
+            size={ButtonSize.large}
             enableShadow
             borderRadius={5}
           />
@@ -66,7 +55,7 @@ export default function Home() {
         <View>
           <Button
             iconSource={() => <FontAwesome5 name="truck-loading" size={20} style={{ marginRight: 10 }} color="white" />}
-            style={styles.bigButton}
+            style={{ width: "100%", height: 80 }}
             onPress={() => router.navigate(Routes.PickUp)}
             label={"Pick up"}
             borderRadius={5}
@@ -97,7 +86,7 @@ const styles = StyleSheet.create({
     marginBottom: 60,
     gap: 20
   },
-  bigButton: { width: "100%", height: 80 },
+  bigButton: {},
   separator: {
     marginVertical: 30,
     height: 1,

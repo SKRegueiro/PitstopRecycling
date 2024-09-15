@@ -3,7 +3,7 @@ import { Text, View } from "@/components/Themed";
 import { Button, Picker, TextField } from "react-native-ui-lib";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
-import { TyresType } from "@/app/pickUp";
+import { TyresType } from "@/app/pickUpView";
 import { Stack } from "expo-router";
 import useMoveOnKeyboardOpen from "@/lib/hooks/useMoveOnKeyboardOpen";
 import { AntDesign } from "@expo/vector-icons";

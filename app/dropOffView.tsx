@@ -8,7 +8,7 @@ import Toast from "react-native-toast-message";
 import { router } from "expo-router";
 import Routes from "@/constants/Routes";
 
-const dropOff = () => {
+const dropOffView = () => {
   const { sites } = useSites();
   const { pickUps } = useInTransitPickUps();
 
@@ -80,4 +80,4 @@ const dropOff = () => {
   );
 };
 
-export default dropOff;
+export default dropOffView;

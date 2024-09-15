@@ -1,8 +1,8 @@
 const Routes = {
-    Home: "/",
-    DropOff: "/dropOff",
-    Fuel: "/fuel",
-    PickUp: "/pickUp"
+  Home: "/",
+  DropOff: "/dropOffView",
+  Fuel: "/fuelView",
+  PickUp: "/pickUpView"
 };
 
 export default Routes;

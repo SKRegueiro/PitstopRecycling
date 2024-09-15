@@ -6,14 +6,14 @@ import QueryKeys from "@/constants/QueryKeys";
 
 const useInTransitPickUps = () => {
   const { profile, isLoading } = useProfile();
+
   const result = useQuery({
     queryKey: QueryKeys.InTransitPickUps,
     queryFn: () => {
       if (profile?.id) return getInTransitPickUpByUser(profile?.id);
 
       return null;
-    },
-    enabled: !!profile?.id
+    }
   });
 
   return {

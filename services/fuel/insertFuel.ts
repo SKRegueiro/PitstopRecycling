@@ -1,18 +1,18 @@
 import { supabase } from "@/lib/supabase";
 
 type FuelProps = {
-  price: string;
+  cost: string;
   createdAt: string;
   employeeId?: string;
-  carId?: string;
+  receiptImageId?: string;
 };
 
 const insertFuel = (fuel: FuelProps) => {
   return supabase.from("fuel").insert({
-    price: fuel.price,
+    cost: fuel.cost,
     created_at: fuel.createdAt,
     employeeId: fuel.employeeId,
-    carId: fuel.carId
+    receiptImageId: fuel.receiptImageId
   });
 };
 
