@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-around",
     flexDirection: "column",
-    padding: 10
+    padding: 20
   }
 });
 

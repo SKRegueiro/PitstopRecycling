@@ -69,7 +69,7 @@ const FuelView = () => {
       accessible={false}
     >
       <View style={{ flex: 1 }}>
-        <Modal visible={isCameraOpen && permission.granted}>
+        <Modal animationType="slide" transparent={false} visible={isCameraOpen && permission.granted}>
           <ScreenView>
             <Text style={styles.text}>Capture the ticket clearly </Text>
             <CameraView style={styles.camera} facing={"back"} ref={cameraRef} />
