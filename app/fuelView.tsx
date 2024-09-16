@@ -1,73 +1,52 @@
-import { decode } from "base64-arraybuffer";
 import React, { useRef, useState } from "react";
 import { Keyboard, StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import { Button, DateTimePicker, Modal, NumberInput, NumberInputData, Text, TextField } from "react-native-ui-lib";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import Label from "react-native-ui-lib/src/components/textField/Label";
 import { Entypo } from "@expo/vector-icons";
-import { supabase } from "@/lib/supabase";
-import insertFuel from "@/services/fuel/insertFuel";
 import ImageViewer from "@/components/ImageViewer";
 import useProfile from "@/lib/hooks/useProfile";
-import Toast from "react-native-toast-message";
 import { router } from "expo-router";
 import Routes from "@/constants/Routes";
+import { CameraCapturedPicture } from "expo-camera/src/Camera.types";
+import useUploadFuel from "@/lib/hooks/useUploadFuel";
+import { ToastError, ToastSuccess } from "@/lib/utils/Toasts";
+import ScreenView from "@/components/ScreenView";
 
 const FuelView = () => {
+  const cameraRef = useRef<CameraView | null>(null);
+  const { uploadFuel, loading } = useUploadFuel();
+  const { profile } = useProfile();
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(new Date());
   const [permission, requestPermission] = useCameraPermissions();
-  const cameraRef = useRef(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
-  const [picture, setPicture] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const { profile } = useProfile();
+  const [picture, setPicture] = useState<CameraCapturedPicture | undefined>(undefined);
 
-  //TODO: clean up the external calls. Meter loading
+  //TODO: Meter loading screen. Secure bucket
   const onSubmit = async () => {
     try {
-      setLoading(true);
-      supabase.storage
-        .from("public_fuel")
-        .upload("picture" + date, decode(picture?.base64), {
-          contentType: "image/png",
-          upsert: false
-        })
-        .then(async (bucketResult) => {
-          await insertFuel({
-            createdAt: date.toISOString(),
-            employeeId: profile?.id.toString(),
-            receiptImageId: bucketResult?.data?.id,
-            cost: amount
-          });
-          Toast.show({
-            type: "success",
-            text1: "Success!",
-            text2: "Your ticket fuel has been uploaded!"
-          });
-          router.navigate(Routes.Home);
-        });
+      await uploadFuel({ amount, date, base64: picture?.base64, userId: profile?.id.toString() });
+      ToastSuccess("Your ticket fuel has been uploaded!");
+      router.navigate(Routes.Home);
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Something went wrong. Try again"
-      });
       console.log(error);
+      ToastError("Something went wrong. Try again later");
     }
-    setLoading(false);
   };
 
   const onTakePicture = async () => {
-    await cameraRef?.current
-      ?.takePictureAsync({ base64: true })
-      .then((photo) => setPicture(photo))
-      .catch((error) => console.log(error))
-      .finally(() => setIsCameraOpen(false));
+    if (cameraRef.current) {
+      await cameraRef.current
+        ?.takePictureAsync({ base64: true })
+        .then((photo: CameraCapturedPicture | undefined) => setPicture(photo))
+        .catch((error) => console.log(error))
+        .finally(() => setIsCameraOpen(false));
+    }
   };
 
   const onRemovePicture = () => {
-    setPicture(null);
+    setPicture(undefined);
   };
 
   if (!permission || !permission.granted) {
@@ -90,7 +69,7 @@ const FuelView = () => {
       </Modal>
 
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.container}>
+        <ScreenView style={styles.container}>
           <View style={styles.inputs}>
             <View style={styles.uploadButton}>
               <Label labelStyle={{ fontSize: 15 }} label={"Amount paid"} />
@@ -120,10 +99,10 @@ const FuelView = () => {
             style={{ width: "90%", height: 80 }}
             borderRadius={5}
             label={"Submit"}
-            disabled={!amount || !picture}
+            disabled={!amount || !picture || loading}
             onPress={() => onSubmit()}
           />
-        </View>
+        </ScreenView>
       </TouchableWithoutFeedback>
     </View>
   );

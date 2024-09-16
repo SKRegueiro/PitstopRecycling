@@ -8,10 +8,10 @@ import { router } from "expo-router";
 import insertPickUp from "@/services/pickups/insertPickUp";
 import { LoaderScreen } from "react-native-ui-lib";
 import Colors from "@/constants/Colors";
-import Toast from "react-native-toast-message";
 import useGetClients from "@/lib/hooks/useGetClients";
 import Routes from "@/constants/Routes";
 import useInTransitPickUps from "@/lib/hooks/useInTransitPickUps";
+import { ToastError, ToastSuccess } from "@/lib/utils/Toasts";
 
 export type TyresType = {
   id: number;
@@ -52,20 +52,12 @@ export default function PickUpView() {
 
       await refetch();
 
-      Toast.show({
-        type: "success",
-        text1: "Success!",
-        text2: "Pick up successfully created ✅"
-      });
+      ToastSuccess("Pick up successfully created ✅");
 
       router.navigate(Routes.Home);
     } catch (error) {
       if (error instanceof Error) {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: error.message
-        });
+        ToastError(error.message);
       }
     } finally {
       setLoading(false);
