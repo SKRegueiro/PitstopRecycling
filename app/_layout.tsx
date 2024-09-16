@@ -55,14 +55,9 @@ function RootLayoutNav() {
           <AuthProvider>
             <Stack>
               <Stack.Screen name="index" options={{ headerShown: true, headerLargeTitle: false }} />
-              <Stack.Screen name="modal" options={{ presentation: "modal" }} />
               <Stack.Screen
                 name="pickUpView"
-                options={{
-                  headerShown: true,
-                  headerBackTitle: "Cancel",
-                  headerTitle: "Pick Up"
-                }}
+                options={{ headerShown: true, headerBackTitle: "Cancel", headerTitle: "Pick Up" }}
               />
               <Stack.Screen
                 name="fuelView"

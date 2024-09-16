@@ -49,27 +49,35 @@ const FuelView = () => {
     setPicture(undefined);
   };
 
+  const onPressOutsideKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   if (!permission || !permission.granted) {
     return (
-      <View style={styles.container}>
+      <ScreenView>
         <TextField style={styles.message} label={"We need your permission to show the camera"}></TextField>
         <Button enableShadow onPress={requestPermission} label="Grant permission" />
-      </View>
+      </ScreenView>
     );
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <Modal visible={isCameraOpen && permission.granted}>
-        <View style={{ paddingVertical: 30, paddingHorizontal: 10, ...styles.container }}>
-          <Text style={styles.text}>Capture the ticket clearly </Text>
-          <CameraView style={styles.camera} facing={"back"} ref={cameraRef} />
-          <Button enableShadow label={"Done"} onPress={onTakePicture}></Button>
-        </View>
-      </Modal>
+    <TouchableWithoutFeedback
+      style={{ height: "100%", width: "100%" }}
+      onPress={onPressOutsideKeyboard}
+      accessible={false}
+    >
+      <View style={{ flex: 1 }}>
+        <Modal visible={isCameraOpen && permission.granted}>
+          <ScreenView>
+            <Text style={styles.text}>Capture the ticket clearly </Text>
+            <CameraView style={styles.camera} facing={"back"} ref={cameraRef} />
+            <Button enableShadow label={"Done"} onPress={onTakePicture}></Button>
+          </ScreenView>
+        </Modal>
 
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <ScreenView style={styles.container}>
+        <ScreenView>
           <View style={styles.inputs}>
             <View style={styles.uploadButton}>
               <Label labelStyle={{ fontSize: 15 }} label={"Amount paid"} />
@@ -103,18 +111,12 @@ const FuelView = () => {
             onPress={() => onSubmit()}
           />
         </ScreenView>
-      </TouchableWithoutFeedback>
-    </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "space-around",
-    flexDirection: "column"
-  },
   textField: {
     borderBottomColor: "black",
     borderBottomWidth: 1,

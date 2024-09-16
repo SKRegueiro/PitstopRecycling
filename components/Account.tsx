@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Button, Input } from "@rneui/themed";
 import { Session } from "@supabase/supabase-js";
+import { ToastError } from "@/lib/utils/Toasts";
 
 export default function Account({ session }: { session: Session }) {
   const [loading, setLoading] = useState(true);
@@ -14,32 +15,28 @@ export default function Account({ session }: { session: Session }) {
     if (session) getProfile();
   }, [session]);
 
+  //TODO: clean this up
   async function getProfile() {
-    try {
-      setLoading(true);
-      if (!session?.user) throw new Error("No user on the session!");
+    setLoading(true);
+    if (!session?.user) return ToastError("No user on the session!");
 
-      const { data, error, status } = await supabase
-        .from("profiles")
-        .select(`username, website, avatar_url`)
-        .eq("id", session?.user.id)
-        .single();
-      if (error && status !== 406) {
-        throw error;
-      }
+    const { data, error, status } = await supabase
+      .from("profiles")
+      .select(`username, website, avatar_url`)
+      .eq("id", session?.user.id)
+      .single();
 
-      if (data) {
-        setUsername(data.username);
-        setWebsite(data.website);
-        setAvatarUrl(data.avatar_url);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message);
-      }
-    } finally {
-      setLoading(false);
+    if (error && status !== 406) {
+      ToastError(error.message);
     }
+
+    if (data) {
+      setUsername(data.username);
+      setWebsite(data.website);
+      setAvatarUrl(data.avatar_url);
+    }
+
+    setLoading(false);
   }
 
   async function updateProfile({
@@ -51,30 +48,24 @@ export default function Account({ session }: { session: Session }) {
     website: string;
     avatar_url: string;
   }) {
-    try {
-      setLoading(true);
-      if (!session?.user) throw new Error("No user on the session!");
+    setLoading(true);
+    if (!session?.user) ToastError("No user on the session!");
 
-      const updates = {
-        id: session?.user.id,
-        username,
-        website,
-        avatar_url,
-        updated_at: new Date()
-      };
+    const updates = {
+      id: session?.user.id,
+      username,
+      website,
+      avatar_url,
+      updated_at: new Date()
+    };
 
-      const { error } = await supabase.from("profiles").upsert(updates);
+    const { error } = await supabase.from("profiles").upsert(updates);
 
-      if (error) {
-        throw error;
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message);
-      }
-    } finally {
-      setLoading(false);
+    if (error) {
+      ToastError(error.message);
     }
+
+    setLoading(false);
   }
 
   return (
