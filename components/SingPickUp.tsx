@@ -3,24 +3,22 @@ import SignatureScreen, { SignatureViewRef } from "react-native-signature-canvas
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Stack } from "expo-router";
 import { ListItem, Text } from "react-native-ui-lib";
+import LoadingModal from "@/components/LoadingModal";
 
+//TODO: improved typing
 interface Props {
   selectedClient?: any;
   onOK: (signature: any) => void;
   tyres: any;
+  isLoading: boolean;
 }
 
-const Sign = ({ selectedClient, onOK, tyres }: Props) => {
+const Sign = ({ selectedClient, onOK, tyres, isLoading }: Props) => {
   const ref = useRef<SignatureViewRef>(null);
   const [scrollEnabled, setScrollEnabled] = useState(true);
 
-  //TODO: check that there is a signature.
-  // Show summary screen or maybe add it to this view.
-  // Create receipt and send email.
-  //ALso add name of the person who signed.
-
-  const handleSignature = (signature: any) => {
-    onOK(ref.current?.readSignature());
+  const handleSubmit = (signature: any) => {
+    onOK(signature);
   };
 
   return (
@@ -34,12 +32,10 @@ const Sign = ({ selectedClient, onOK, tyres }: Props) => {
           headerRight: () => null
         }}
       />
-
       <View style={styles.text}>
         <Text text40R>Client:</Text>
         <Text text80R>{selectedClient.business_name}</Text>
       </View>
-
       <View>
         <Text text40R style={{ alignSelf: "flex-start", marginBottom: 5, borderBottomWidth: 1, borderColor: "black" }}>
           Tyres collected:
@@ -62,18 +58,18 @@ const Sign = ({ selectedClient, onOK, tyres }: Props) => {
           </ListItem>
         ))}
       </View>
-
       <SignatureScreen
         onBegin={() => setScrollEnabled(false)}
         onEnd={() => setScrollEnabled(true)}
         ref={ref}
-        onOK={handleSignature}
+        onOK={handleSubmit}
         autoClear={true}
         descriptionText={"Sign"}
         style={styles.signatureContainer}
         webviewContainerStyle={styles.signatureContainer}
         backgroundColor="transparent"
       />
+      <LoadingModal isLoading={isLoading} />
     </ScrollView>
   );
 };

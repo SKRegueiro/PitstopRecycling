@@ -1,17 +1,15 @@
-import { Alert } from "react-native";
 import { useState } from "react";
 import useProfile from "@/lib/hooks/useProfile";
 import ClientSelection from "@/components/ClientSelection";
 import InputTyres from "@/components/InputTyres";
 import SingPickUp from "@/components/SingPickUp";
+import useGetClients from "@/lib/hooks/useGetClients";
+import useInTransitPickUps from "@/lib/hooks/useInTransitPickUps";
+import useStoreSignature from "@/lib/hooks/useStoreSignature";
+import { ToastError, ToastSuccess } from "@/lib/utils/Toasts";
 import { router } from "expo-router";
 import insertPickUp from "@/services/pickups/insertPickUp";
-import { LoaderScreen } from "react-native-ui-lib";
-import Colors from "@/constants/Colors";
-import useGetClients from "@/lib/hooks/useGetClients";
 import Routes from "@/constants/Routes";
-import useInTransitPickUps from "@/lib/hooks/useInTransitPickUps";
-import { ToastError, ToastSuccess } from "@/lib/utils/Toasts";
 
 export type TyresType = {
   id: number;
@@ -31,9 +29,10 @@ export default function PickUpView() {
   const { profile } = useProfile();
   const { clients } = useGetClients();
   const { refetch } = useInTransitPickUps();
+  const { uploadSignature } = useStoreSignature();
 
-  //TODO: store signature. Create bill. Send email. store pick up.
-  const onSubmit = async () => {
+  //TODO: Create bill. Send email. store pick up.
+  const onSubmit = async (signature: any) => {
     try {
       setLoading(true);
 
@@ -46,15 +45,17 @@ export default function PickUpView() {
         }))
       };
 
-      const { error } = await insertPickUp(updates);
+      uploadSignature({ base64: signature, signerName: "test" }).then(async () => {
+        const { error } = await insertPickUp(updates);
 
-      if (error) Alert.alert(error.message);
+        if (error) ToastError(error.message);
 
-      await refetch();
+        await refetch();
 
-      ToastSuccess("Pick up successfully created ✅");
+        ToastSuccess("Pick up successfully created ✅");
 
-      router.navigate(Routes.Home);
+        router.navigate(Routes.Home);
+      });
     } catch (error) {
       if (error instanceof Error) {
         ToastError(error.message);
@@ -90,13 +91,9 @@ export default function PickUpView() {
       <SingPickUp
         selectedClient={clients?.find((client) => (client.id = selectedClientId))}
         tyres={tyres}
-        //todo: upload signature
-        onOK={(value) => onSubmit()}
+        onOK={(value) => onSubmit(value)}
+        isLoading={loading}
       />
     );
-  }
-
-  if (loading) {
-    return <LoaderScreen message={"Message goes here"} color={Colors.light.background} />;
   }
 }
