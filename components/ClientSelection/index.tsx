@@ -27,6 +27,7 @@ const ClientSelection = ({
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [showModal, setShowModal] = useState(false);
 
+  //todo: extract functionality to parent component
   const onSaveClient = async (selectedClientData: { name: string; email: string; abn: string; address: string }) => {
     try {
       const { error } = await insertNewClient({

@@ -4,10 +4,8 @@ import { Database } from "@/database.types";
 type PickUpProps = Database["public"]["Tables"]["pickups"]["Insert"];
 
 //TODO change type
-const insertPickUp = async (data: any) => {
-  const { error } = await supabase.from("pickups").insert(data);
-
-  return { error };
+const insertPickUp = async (pickUp: any) => {
+  return supabase.from("pickups").insert(pickUp).select();
 };
 
 export default insertPickUp;

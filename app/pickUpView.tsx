@@ -5,11 +5,11 @@ import InputTyres from "@/components/InputTyres";
 import SingPickUp from "@/components/SingPickUp";
 import useGetClients from "@/lib/hooks/useGetClients";
 import useInTransitPickUps from "@/lib/hooks/useInTransitPickUps";
-import useStoreSignature from "@/lib/hooks/useStoreSignature";
 import { ToastError, ToastSuccess } from "@/lib/utils/Toasts";
 import { router } from "expo-router";
 import insertPickUp from "@/services/pickups/insertPickUp";
 import Routes from "@/constants/Routes";
+import sendEmail from "@/services/pickups/sendEmail";
 
 export type TyresType = {
   id: number;
@@ -29,7 +29,6 @@ export default function PickUpView() {
   const { profile } = useProfile();
   const { clients } = useGetClients();
   const { refetch } = useInTransitPickUps();
-  const { uploadSignature } = useStoreSignature();
 
   //TODO: Create bill. Send email. store pick up.
   const onSubmit = async (signature: any) => {
@@ -45,17 +44,29 @@ export default function PickUpView() {
         }))
       };
 
-      uploadSignature({ base64: signature, signerName: "test" }).then(async () => {
-        const { error } = await insertPickUp(updates);
+      //todo: add error handling
+      // uploadSignature({ base64: signature, signerName: "test" }).then(async () => {
+      const { data, error } = await insertPickUp(updates);
+      const selectedClient = clients.find((client) => client.id === selectedClientId);
 
-        if (error) ToastError(error.message);
-
-        await refetch();
-
-        ToastSuccess("Pick up successfully created ✅");
-
-        router.navigate(Routes.Home);
+      //todo: extract out
+      await sendEmail({
+        pickUpId: data[0].id,
+        tyres: tyres,
+        clientId: selectedClientId!,
+        clients: {
+          ...selectedClient
+        },
+        signature: signature
       });
+
+      if (error) ToastError(error.message);
+
+      await refetch();
+
+      ToastSuccess("Pick up successfully created ✅");
+
+      router.navigate(Routes.Home);
     } catch (error) {
       if (error instanceof Error) {
         ToastError(error.message);

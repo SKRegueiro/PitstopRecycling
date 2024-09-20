@@ -1,9 +1,7 @@
 import { supabase } from "@/lib/supabase";
 
-const getAllClients = async () => {
-  const result = await supabase.from("clients").select("*");
-
-  return { data: result.data, error: result.error };
+const getAllClients = () => {
+  return supabase.from("clients").select("*");
 };
 
 export default getAllClients;
