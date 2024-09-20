@@ -1,28 +1,22 @@
-import { View } from "react-native";
+import React from "react";
 import Auth from "@/components/Auth";
 import Home from "@/components/Home";
 import useSession from "@/lib/hooks/useSession";
-import { LoaderScreen } from "react-native-ui-lib";
-import Colors from "@/constants/Colors";
 
 export default function Index() {
   const { session, isLoading } = useSession();
 
   if (isLoading) {
-    return <LoaderScreen message={"Loading ..."} color={Colors.light.background} />;
+    return null;
   }
 
-  if (session && session.user)
-    return (
-      <View>
-        <Home />
-      </View>
-    );
+  if (!isLoading && !session) {
+    return <Auth />;
+  }
 
-  if (!session && !isLoading)
-    return (
-      <View>
-        <Auth />
-      </View>
-    );
+  if (session) {
+    return <Home />;
+  }
+
+  return null; // Ensure nothing is rendered prematurely
 }

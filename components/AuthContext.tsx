@@ -21,13 +21,16 @@ export function AuthProvider(props: AuthContextProps) {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      setIsLoading(false);
     });
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 
-    setIsLoading(false);
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
   }, []);
 
   const value = { isLoading, session };
