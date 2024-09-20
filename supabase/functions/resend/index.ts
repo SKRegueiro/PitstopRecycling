@@ -26,7 +26,6 @@ const handler = async (request: Request): Promise<Response> => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     // global: { headers: { Authorization: request.headers.get("Authorization")! } }
   });
-
   const pickUp = await request.json();
 
   try {
@@ -63,14 +62,10 @@ const handler = async (request: Request): Promise<Response> => {
 
       if (error) {
         console.error("Error updating pickup:", error);
-        return new Response("Invoice sent, but failed to update the database.", {
-          status: 500
-        });
+        return new Response("Invoice sent, but failed to update the database.", { status: 500 });
       }
 
-      return new Response("Invoice sent successfully!", {
-        status: 200
-      });
+      return new Response("Invoice sent successfully!", { status: 200 });
     }
   } catch (e) {
     console.log("error", e);

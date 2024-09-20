@@ -45,7 +45,6 @@ export default function PickUpView() {
       };
 
       //todo: add error handling
-      // uploadSignature({ base64: signature, signerName: "test" }).then(async () => {
       const { data, error } = await insertPickUp(updates);
       const selectedClient = clients.find((client) => client.id === selectedClientId);
 
