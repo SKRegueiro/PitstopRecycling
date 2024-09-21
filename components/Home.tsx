@@ -4,19 +4,30 @@ import { Button, ButtonSize, View } from "react-native-ui-lib";
 import { router, Stack, useFocusEffect } from "expo-router";
 import { FontAwesome5, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import useInTransitPickUps from "@/lib/hooks/useInTransitPickUps";
-import useProfile from "@/lib/hooks/useProfile";
 import Routes from "@/constants/Routes";
 import StatsCard from "@/components/StatCard";
 
-export default function Home() {
-  const { haveInTransitPickUps, tyresByType, refetch } = useInTransitPickUps();
-  const { profile } = useProfile();
+type Props = {
+  profile: {
+    created_at: string;
+    email: string;
+    name: string;
+    type: string;
+  };
+};
+
+export default function Home({ profile }: Props) {
+  const { haveInTransitPickUps, tyresByType, refetch, isLoading } = useInTransitPickUps();
 
   useFocusEffect(
     useCallback(() => {
       refetch();
     }, [])
   );
+
+  const goToDropOff = () => router.navigate(Routes.DropOff);
+  const goToFuel = () => router.navigate(Routes.Fuel);
+  const goToPickUp = () => router.navigate(Routes.PickUp);
 
   return (
     <View style={styles.container} useSafeArea>
@@ -26,41 +37,44 @@ export default function Home() {
           headerRight: () => <FontAwesome5 name="clock" size={24} color="black" />
         }}
       />
-      <StatsCard name={profile?.name} haveInTransitPickUps={haveInTransitPickUps} tyresByType={tyresByType} />
+      <StatsCard
+        isLoading={isLoading}
+        name={profile?.name}
+        haveInTransitPickUps={haveInTransitPickUps}
+        tyresByType={tyresByType}
+      />
 
       <View style={styles.buttons}>
-        <View style={{ width: "100%", justifyContent: "space-between", flexDirection: "row" }}>
+        <View style={styles.buttonRow}>
           <Button
-            iconSource={() => <MaterialIcons name="download" size={24} color="white" style={{ marginRight: 10 }} />}
-            onPress={() => router.navigate(Routes.DropOff)}
+            iconSource={() => <MaterialIcons name="download" size={24} color="white" style={styles.icon} />}
+            onPress={goToDropOff}
             label={"Drop off"}
             size={ButtonSize.large}
-            style={{ width: "45%", height: 80 }}
+            style={styles.largeButton}
             enableShadow
             borderRadius={5}
             disabled={!haveInTransitPickUps}
           />
           <Button
-            iconSource={() => (
-              <MaterialCommunityIcons style={{ marginRight: 10 }} name="fuel" size={24} color="white" />
-            )}
-            onPress={() => router.navigate(Routes.Fuel)}
+            iconSource={() => <MaterialCommunityIcons name="fuel" size={24} color="white" style={styles.icon} />}
+            onPress={goToFuel}
             label={"Log fuel"}
-            style={{ width: "45%", height: 80 }}
             size={ButtonSize.large}
+            style={styles.largeButton}
             enableShadow
             borderRadius={5}
           />
         </View>
         <View>
           <Button
-            iconSource={() => <FontAwesome5 name="truck-loading" size={20} style={{ marginRight: 10 }} color="white" />}
-            style={{ width: "100%", height: 80 }}
-            onPress={() => router.navigate(Routes.PickUp)}
+            iconSource={() => <FontAwesome5 name="truck-loading" size={20} style={styles.icon} color="white" />}
+            onPress={goToPickUp}
             label={"Pick up"}
-            borderRadius={5}
             size={ButtonSize.large}
+            style={styles.fullWidthButton}
             enableShadow
+            borderRadius={5}
           />
         </View>
       </View>
@@ -69,12 +83,6 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  card: {
-    marginTop: 20,
-    height: "30%",
-    width: "100%",
-    backgroundColor: "#fff"
-  },
   container: {
     height: "100%",
     display: "flex",
@@ -83,13 +91,23 @@ const styles = StyleSheet.create({
     justifyContent: "space-between"
   },
   buttons: {
-    marginBottom: 60,
+    marginBottom: 30,
     gap: 20
   },
-  bigButton: {},
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%"
+  buttonRow: {
+    width: "100%",
+    justifyContent: "space-between",
+    flexDirection: "row"
+  },
+  largeButton: {
+    width: "45%",
+    height: 80
+  },
+  fullWidthButton: {
+    width: "100%",
+    height: 80
+  },
+  icon: {
+    marginRight: 10
   }
 });

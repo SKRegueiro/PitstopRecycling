@@ -4,8 +4,19 @@ import { useQuery } from "@tanstack/react-query";
 import useSession from "@/lib/hooks/useSession";
 import QueryKeys from "@/constants/QueryKeys";
 
-const useProfile = () => {
-  const { session } = useSession();
+type Props = {
+  isLoading: boolean;
+  profile: {
+    created_at: string;
+    email: string;
+    id: number;
+    name: string;
+    type: "Driver" | "Admin" | "Customer";
+  };
+};
+
+const useProfile = (): Props => {
+  const { session, isLoading: isSessionLoading } = useSession();
 
   const { data, isError, error, isLoading } = useQuery({
     queryKey: QueryKeys.Profile,
@@ -18,7 +29,8 @@ const useProfile = () => {
     Alert.alert(error.message);
   }
 
-  return { isLoading, profile: data?.data };
+  //TODO: fix this
+  return { isLoading: isSessionLoading || isLoading, profile: data?.data };
 };
 
 export default useProfile;

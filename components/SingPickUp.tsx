@@ -4,22 +4,20 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { Stack } from "expo-router";
 import { ListItem, Text } from "react-native-ui-lib";
 import LoadingModal from "@/components/LoadingModal";
+import Client from "@/types/Client";
 
-//TODO: improved typing
 interface Props {
-  selectedClient?: any;
-  onOK: (signature: any) => void;
-  tyres: any;
+  client: Client;
+  onOK: (signature: any) => void; // TODO: improved typing
+  tyres: any; // TODO: improved typing
   isLoading: boolean;
 }
 
-const Sign = ({ selectedClient, onOK, tyres, isLoading }: Props) => {
+const Sign = ({ client, onOK, tyres, isLoading }: Props) => {
   const ref = useRef<SignatureViewRef>(null);
   const [scrollEnabled, setScrollEnabled] = useState(true);
 
-  const handleSubmit = (signature: any) => {
-    onOK(signature);
-  };
+  const handleSubmit = (signature: any) => onOK(signature);
 
   return (
     <ScrollView contentInset={{ bottom: 100 }} scrollEnabled={scrollEnabled} contentContainerStyle={styles.container}>
@@ -28,29 +26,21 @@ const Sign = ({ selectedClient, onOK, tyres, isLoading }: Props) => {
           headerShown: true,
           title: "Signature",
           headerTitleAlign: "center",
-          headerTitle: () => <Text style={{ fontWeight: "bold", fontSize: 20 }}>Signature </Text>,
+          headerTitle: () => <Text style={styles.headerTitle}>Signature</Text>,
           headerRight: () => null
         }}
       />
-      <View style={styles.text}>
+      <View style={styles.textContainer}>
         <Text text40R>Client:</Text>
-        <Text text80R>{selectedClient.business_name}</Text>
+        <Text text80R>{client.business_name}</Text>
       </View>
       <View>
-        <Text text40R style={{ alignSelf: "flex-start", marginBottom: 5, borderBottomWidth: 1, borderColor: "black" }}>
+        <Text text40R style={styles.textContainer}>
           Tyres collected:
         </Text>
         {tyres.map((item: { id: number; type: string; quantity: number }) => (
-          <ListItem style={{ alignItems: "center", gap: 10 }} key={item.id} activeOpacity={1}>
-            <View
-              style={{
-                borderColor: "black",
-                borderWidth: 1,
-                width: "100%",
-                padding: 5,
-                borderRadius: 5
-              }}
-            >
+          <ListItem style={styles.listItem} key={item.id} activeOpacity={1}>
+            <View style={styles.listItemContent}>
               <Text text80R>
                 {item.type}: {item.quantity.toString()}
               </Text>
@@ -89,8 +79,23 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
     gap: 20
   },
-  text: {
+  headerTitle: {
+    fontWeight: "bold",
+    fontSize: 20
+  },
+  textContainer: {
     width: "100%"
+  },
+  listItem: {
+    alignItems: "center",
+    gap: 10
+  },
+  listItemContent: {
+    borderColor: "black",
+    borderWidth: 1,
+    width: "100%",
+    padding: 5,
+    borderRadius: 5
   }
 });
 

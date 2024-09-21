@@ -1,7 +1,14 @@
 import { supabase } from "@/lib/supabase";
+import Client from "@/types/Client";
 
-const getAllClients = () => {
-  return supabase.from("clients").select("*");
+const getAllClients = async (): Promise<Client[]> => {
+  const { data, error } = await supabase.from("clients").select("*");
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
 };
 
 export default getAllClients;

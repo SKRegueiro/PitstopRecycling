@@ -4,14 +4,11 @@ import Client from "@/types/Client";
 type Props = {
   by: keyof Client;
   value: string;
-  column: keyof Client | undefined;
+  column: keyof Client | "*";
 };
 
 const selectClientsColumnBy = async ({ column, by, value }: Props) => {
-  const { data, error } = await supabase
-    .from("clients")
-    .select(column || "*")
-    .eq(by, value);
+  const { data, error } = await supabase.from("clients").select(column).eq(by, value);
 
   return { data, error };
 };

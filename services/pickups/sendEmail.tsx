@@ -12,10 +12,11 @@ type Props = {
     signer_names: string[];
     business_name: string;
   };
-  signature: string;
+  signature: ArrayBuffer;
 };
 
 const sendEmail = (body: Props) => {
+  //TODO: extract URL into env
   return fetch("https://yheytbqqhcmmeyhkbhim.supabase.co/functions/v1/resend", {
     method: "POST",
     headers: {

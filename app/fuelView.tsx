@@ -57,24 +57,20 @@ const FuelView = () => {
   if (!permission || !permission.granted) {
     return (
       <ScreenView>
-        <TextField style={styles.message} label={"We need your permission to show the camera"}></TextField>
+        <TextField style={styles.message} label={"We need your permission to show the camera"} />
         <Button enableShadow onPress={requestPermission} label="Grant permission" />
       </ScreenView>
     );
   }
 
   return (
-    <TouchableWithoutFeedback
-      style={{ height: "100%", width: "100%" }}
-      onPress={onPressOutsideKeyboard}
-      accessible={false}
-    >
-      <View style={{ flex: 1 }}>
+    <TouchableWithoutFeedback style={styles.fullScreen} onPress={onPressOutsideKeyboard} accessible={false}>
+      <View style={styles.container}>
         <Modal animationType="slide" transparent={false} visible={isCameraOpen && permission.granted}>
           <ScreenView>
-            <Text style={styles.text}>Capture the ticket clearly </Text>
+            <Text style={styles.text}>Capture the ticket clearly</Text>
             <CameraView style={styles.camera} facing={"back"} ref={cameraRef} />
-            <Button enableShadow label={"Done"} onPress={onTakePicture}></Button>
+            <Button enableShadow label={"Done"} onPress={onTakePicture} />
           </ScreenView>
         </Modal>
 
@@ -83,7 +79,7 @@ const FuelView = () => {
         <ScreenView>
           <View style={styles.inputs}>
             <View style={styles.uploadButton}>
-              <Label labelStyle={{ fontSize: 15 }} label={"Amount paid"} />
+              <Label labelStyle={styles.label} label={"Amount paid"} />
               <NumberInput
                 textFieldProps={{ style: styles.textField, maxLength: 5 }}
                 leadingText={"$"}
@@ -93,8 +89,8 @@ const FuelView = () => {
               />
             </View>
             <View style={styles.uploadButton}>
-              <Label labelStyle={{ fontSize: 15 }} label={"Date"} />
-              <DateTimePicker style={styles.textField} value={date} onChange={setDate} mode={"date"}></DateTimePicker>
+              <Label labelStyle={styles.label} label={"Date"} />
+              <DateTimePicker style={styles.textField} value={date} onChange={setDate} mode={"date"} />
             </View>
           </View>
           <ImageViewer path={picture?.uri} onRemove={onRemovePicture} />
@@ -103,15 +99,15 @@ const FuelView = () => {
             label={!picture ? "Receipt proof" : "Change photo"}
             onPress={() => setIsCameraOpen(true)}
           >
-            <Entypo style={{ marginRight: 10 }} name="camera" size={24} color="white" />
+            <Entypo style={styles.cameraIcon} name="camera" size={24} color="white" />
           </Button>
           <Button
             enableShadow
-            style={{ width: "90%", height: 80 }}
+            style={styles.submitButton}
             borderRadius={5}
             label={"Submit"}
             disabled={!amount || !picture || loading}
-            onPress={() => onSubmit()}
+            onPress={onSubmit}
           />
         </ScreenView>
       </View>
@@ -120,6 +116,13 @@ const FuelView = () => {
 };
 
 const styles = StyleSheet.create({
+  fullScreen: {
+    height: "100%",
+    width: "100%"
+  },
+  container: {
+    flex: 1
+  },
   textField: {
     borderBottomColor: "black",
     borderBottomWidth: 1,
@@ -137,8 +140,7 @@ const styles = StyleSheet.create({
     gap: 20
   },
   label: {
-    borderBottomColor: "black",
-    borderBottomWidth: 1
+    fontSize: 15
   },
   message: {
     textAlign: "center",
@@ -148,16 +150,12 @@ const styles = StyleSheet.create({
     height: "60%",
     width: "100%"
   },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: "row",
-    backgroundColor: "transparent",
-    margin: 64
+  cameraIcon: {
+    marginRight: 10
   },
-  button: {
-    flex: 1,
-    alignSelf: "flex-end",
-    alignItems: "center"
+  submitButton: {
+    width: "90%",
+    height: 80
   },
   text: {
     fontSize: 24,

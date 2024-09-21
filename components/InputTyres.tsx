@@ -3,14 +3,14 @@ import { Text, View } from "@/components/Themed";
 import { Button, Picker, TextField } from "react-native-ui-lib";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
-import { TyresType } from "@/app/pickUpView";
 import { Stack } from "expo-router";
 import useMoveOnKeyboardOpen from "@/lib/hooks/useMoveOnKeyboardOpen";
 import { AntDesign } from "@expo/vector-icons";
+import Tyre from "@/types/Tyre";
 
 type Props = {
-  tyres: TyresType[];
-  onTyresChange: (value: TyresType[]) => void;
+  tyres: Tyre[];
+  onTyresChange: (value: Tyre[]) => void;
   goNext: () => void;
 };
 
@@ -45,21 +45,21 @@ export default function InputTyres({ tyres, onTyresChange, goNext }: Props) {
   };
 
   return (
-    <View style={{ ...styles.container, bottom }}>
+    <View style={[styles.container, { bottom }]}>
       <View>
         <Stack.Screen
           options={{
             headerShown: true,
             title: "Pick up",
             headerTitleAlign: "center",
-            headerTitle: () => <Text style={{ fontSize: 15, fontWeight: "bold" }}>Pick up</Text>,
+            headerTitle: () => <Text style={styles.headerTitle}>Pick up</Text>,
             headerRight: () => null
           }}
         />
         <Text style={styles.title}>How many tyres do you have?</Text>
         <View>
           <FlatList
-            style={{ width: "100%", paddingTop: 50 }}
+            style={styles.list}
             data={tyres}
             renderItem={({ item }) => (
               <Item id={item.id} quantity={item.quantity} type={item.type} onRemove={onRemoveItem} />
@@ -73,7 +73,7 @@ export default function InputTyres({ tyres, onTyresChange, goNext }: Props) {
             <TextField
               placeholder={"Quantity"}
               keyboardType="numeric"
-              style={{ minWidth: "15%", color: "black" }}
+              style={styles.quantityInput}
               onChangeText={(value) => setTireQuantity(value)}
               placeholderTextColor={"#A9A9AC"}
               value={tireQuantity}
@@ -82,19 +82,17 @@ export default function InputTyres({ tyres, onTyresChange, goNext }: Props) {
 
             <Picker
               value={tireType}
-              useSafeArea={true}
+              useSafeArea
               placeholder={"Type"}
               fieldType={"filter"}
               useWheelPicker
-              onPress={() => Keyboard.dismiss()}
-              onChange={(value: any) => {
-                setTireType(value);
-              }}
+              onPress={Keyboard.dismiss}
+              onChange={(value: any) => setTireType(value)}
             >
               <Picker.Item label={""} key={0} value={""} />
               <Picker.Item label={"Passenger"} key={1} value={"Passenger"} />
               <Picker.Item label={"Light truck"} key={2} value={"Light truck"} />
-              <Picker.Item label={"Truck "} key={3} value={"Truck"} />
+              <Picker.Item label={"Truck"} key={3} value={"Truck"} />
               <Picker.Item label={"4x4"} key={4} value={"4x4"} />
             </Picker>
           </View>
@@ -102,16 +100,8 @@ export default function InputTyres({ tyres, onTyresChange, goNext }: Props) {
         </View>
       </View>
 
-      <Button
-        style={styles.button}
-        disabled={tyres.length === 0}
-        enableShadow
-        round
-        label={">"}
-        onPress={() => goNext()}
-      />
+      <Button style={styles.button} disabled={tyres.length === 0} enableShadow round label={">"} onPress={goNext} />
 
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
     </View>
   );
@@ -143,52 +133,58 @@ const styles = StyleSheet.create({
     padding: 10,
     height: "100%"
   },
-  counter: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 10,
-    backgroundColor: "#f9c2ff"
+  headerTitle: {
+    fontSize: 15,
+    fontWeight: "bold"
   },
   title: {
     textAlign: "center",
     fontSize: 20,
     fontWeight: "bold"
   },
+  list: {
+    width: "100%",
+    paddingTop: 50
+  },
   item: {
-    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     borderRadius: 5,
     backgroundColor: "#f9c2ff",
     padding: 15,
-    gap: 20,
     marginVertical: 8,
     marginHorizontal: 16
   },
+  counter: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: "#f9c2ff"
+  },
   input: {
-    color: "black !important",
-    display: "flex",
-    overflow: "hidden",
+    color: "black",
+    flexDirection: "row",
     borderColor: "black",
     padding: 10,
     borderWidth: 2,
     borderRadius: 30,
     alignItems: "center",
     marginTop: 40,
-    width: "100%",
-    flexDirection: "row",
     justifyContent: "space-around",
-    gap: 10
+    gap: 10,
+    width: "100%"
   },
   textField: {
-    display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     gap: 20
+  },
+  quantityInput: {
+    minWidth: "15%",
+    color: "black"
   },
   button: {
     position: "absolute",

@@ -21,18 +21,37 @@ type InvoiceData = {
   total: number;
 };
 
-//TODO: add authorization check
+type Body = {
+  pickUpId: number;
+  tyres: { id: number; type: string; quantity: number }[];
+  clientId: number;
+  created_at: string;
+  invoice_sent: boolean;
+  clients: {
+    id: number;
+    abn: string;
+    email: string;
+    active: boolean;
+    address: string;
+    created_at: string;
+    signer_names: string[];
+    business_name: string;
+  };
+  signature: ArrayBuffer;
+};
+
+//TODO: add authorization check. Store the invoice
 const handler = async (request: Request): Promise<Response> => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     // global: { headers: { Authorization: request.headers.get("Authorization")! } }
   });
-  const pickUp = await request.json();
+  const pickUp: Body = await request.json();
 
   try {
     const invoiceNumber = generateInvoiceNumber(pickUp.pickUpId);
     const amount = pickUp.tyres.map((tyre) => tyre.quantity * 50).reduce((total, price) => total + price, 0);
     const date = new Date(pickUp.created_at);
-    const options = { year: "numeric", month: "long", day: "numeric" };
+    const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "long", day: "numeric" };
     const readableDate = new Intl.DateTimeFormat("en-GB", options).format(date);
 
     const invoiceData = {
@@ -49,6 +68,8 @@ const handler = async (request: Request): Promise<Response> => {
     };
 
     const invoice = await createPdf(invoiceData, pickUp.signature);
+    console.log("invoice made");
+
     const email = await sendEmail({
       invoicePdf: invoice,
       email: pickUp.clients.email,
@@ -58,14 +79,18 @@ const handler = async (request: Request): Promise<Response> => {
     });
 
     if (email.status === 200) {
-      const { error } = await supabase.from("pickups").update({ invoice_sent: true }).eq("id", pickUp.id);
+      console.log("email sent");
+      const { error } = await supabase.from("pickups").update({ invoice_sent: true }).eq("id", pickUp.pickUpId);
 
       if (error) {
         console.error("Error updating pickup:", error);
         return new Response("Invoice sent, but failed to update the database.", { status: 500 });
       }
 
+      console.log("Records updated");
       return new Response("Invoice sent successfully!", { status: 200 });
+    } else {
+      return new Response("The email couldn't be sent", { status: 500 });
     }
   } catch (e) {
     console.log("error", e);
@@ -253,8 +278,7 @@ async function createPdf(invoiceData: InvoiceData, signatureArrayBuffer: ArrayBu
 
     // Save and return the PDF in base64 format
     const pdfBytes = await pdfDoc.save();
-    const base64Pdf = btoa(String.fromCharCode(...new Uint8Array(pdfBytes)));
-    return base64Pdf;
+    return btoa(String.fromCharCode(...new Uint8Array(pdfBytes)));
   } catch (e) {
     console.log("Error creating PDF:", e);
     throw e;

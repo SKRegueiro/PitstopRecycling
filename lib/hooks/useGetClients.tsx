@@ -1,14 +1,21 @@
 import getAllClients from "@/services/clients/getAllClients";
 import { useQuery } from "@tanstack/react-query";
 import QueryKeys from "@/constants/QueryKeys";
+import Client from "@/types/Client";
 
-const useGetClients = () => {
-  const { data, error, isLoading } = useQuery({
+type Response = {
+  clients: Client[];
+  isLoading: boolean;
+  error: Error | null;
+};
+
+const useGetClients = (): Response => {
+  const { data, error, isLoading } = useQuery<Client[]>({
     queryKey: QueryKeys.Clients,
     queryFn: getAllClients
   });
 
-  return { clients: data?.data ? data.data : [], isLoading, error };
+  return { clients: data || [], isLoading, error };
 };
 
 export default useGetClients;

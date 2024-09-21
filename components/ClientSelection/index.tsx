@@ -6,69 +6,53 @@ import { Button } from "react-native-ui-lib";
 import { Stack } from "expo-router";
 import NewClientModal from "@/components/ClientSelection/NewClientModal";
 import Colors from "@/constants/Colors";
-import selectClientsColumnBy from "@/services/clients/selectColumnBy";
-import insertNewClient from "@/services/clients/insertNewClient";
 import Client from "@/types/Client";
 import Item from "@/components/ClientSelection/Item";
+import useSaveNewClient from "@/lib/hooks/useSaveNewClient";
 
-const ClientSelection = ({
-  goBack,
-  goNext,
-  selectedClient,
-  onSelectClient
-}: {
-  goBack: () => void;
-  goNext: () => void;
-  selectedClient: number | undefined;
-  onSelectClient: (clientId?: number) => void;
-}) => {
+type Props = {
+  onBack: () => void;
+  onNext: () => void;
+  selectedClientId: number | undefined;
+  onSelectClient: (client?: Client) => void;
+};
+
+const ClientSelection = ({ onBack, onNext, selectedClientId, onSelectClient }: Props) => {
   const { isLoading, clients } = useGetClients();
   const [searchedName, setSearchedName] = useState<string>("");
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const { saveNewClient } = useSaveNewClient();
 
-  //todo: extract functionality to parent component
-  const onSaveClient = async (selectedClientData: { name: string; email: string; abn: string; address: string }) => {
-    try {
-      const { error } = await insertNewClient({
-        business_name: selectedClientData.name,
-        email: selectedClientData.email,
-        abn: selectedClientData.abn,
-        address: selectedClientData.address
-      });
+  const onSaveClient = async (selectedClientData: {
+    business_name: string;
+    email: string;
+    abn: string;
+    address: string;
+  }) => {
+    const { newClient } = await saveNewClient(selectedClientData);
 
-      const { data } = await selectClientsColumnBy({
-        by: "business_name",
-        value: selectedClientData.name,
-        column: "id"
-      });
-
-      if (error) throw error;
-      onSelectClient(data?.[0].id!);
+    if (newClient) {
+      onSelectClient(newClient);
       setShowModal(false);
-      goNext();
-    } catch (error) {
-      console.log(error);
+      onNext();
     }
   };
 
   const onSelect = (id: number) => {
-    if (selectedClient === id) {
+    if (selectedClientId === id) {
       onSelectClient(undefined);
     } else {
-      onSelectClient(id);
+      onSelectClient(clients?.find((client) => client.id === id));
     }
   };
 
   const onSearch = (searchedName: string) => {
-    setSearchedName(searchedName);
-    setFilteredClients(
-      clients.filter((clients) => clients.business_name.toLowerCase().includes(searchedName.toLowerCase().trim()))
+    const filteredClients = clients.filter((client) =>
+      client.business_name.toLowerCase().includes(searchedName.toLowerCase().trim())
     );
-
-    if (searchedName.length === 0) {
-      setFilteredClients(clients);
-    }
+    setSearchedName(searchedName);
+    setFilteredClients(filteredClients);
   };
 
   return (
@@ -78,9 +62,9 @@ const ClientSelection = ({
           headerShown: true,
           title: "Select client",
           headerTitleAlign: "center",
-          headerTitle: () => <Text style={{ fontWeight: "bold", fontSize: 20 }}>Select client</Text>,
+          headerTitle: () => <Text style={styles.headerTitle}>Select client</Text>,
           headerRight: () => (
-            <Text style={{ fontSize: 20, color: Colors.light.blue30 }} onPress={() => setShowModal(true)}>
+            <Text style={styles.addText} onPress={() => setShowModal(true)}>
               + Add
             </Text>
           )
@@ -88,31 +72,25 @@ const ClientSelection = ({
       />
 
       <SearchBar
-        containerStyle={{ borderRadius: 30 }}
-        inputContainerStyle={{ borderRadius: 30 }}
+        containerStyle={styles.searchBarContainer}
+        inputContainerStyle={styles.searchBarInputContainer}
         value={searchedName}
         onChangeText={onSearch}
       />
       {isLoading ? (
+        // improve this
         <Text>Loading...</Text>
       ) : (
         <FlatList
           style={styles.list}
           data={searchedName.length > 0 ? filteredClients : clients}
-          renderItem={({ item }) => <Item selectedId={selectedClient} onSelect={onSelect} {...item} />}
+          renderItem={({ item }) => <Item selectedId={selectedClientId} onSelect={onSelect} {...item} />}
           keyExtractor={(item) => item.id.toString()}
         />
       )}
       <View style={styles.buttons}>
-        <Button style={styles.button} enableShadow round label={"<"} onPress={() => goBack()} />
-        <Button
-          style={styles.button}
-          disabled={!selectedClient}
-          enableShadow
-          round
-          label={">"}
-          onPress={() => goNext()}
-        />
+        <Button style={styles.button} enableShadow round label={"<"} onPress={onBack} />
+        <Button style={styles.button} disabled={!selectedClientId} enableShadow round label={">"} onPress={onNext} />
       </View>
 
       <NewClientModal isVisible={showModal} onClose={() => setShowModal(false)} onSaveClient={onSaveClient} />
@@ -125,8 +103,19 @@ const styles = StyleSheet.create({
     margin: 20,
     height: "100%"
   },
-  button: {
-    gap: 20
+  headerTitle: {
+    fontWeight: "bold",
+    fontSize: 20
+  },
+  addText: {
+    fontSize: 20,
+    color: Colors.light.blue30
+  },
+  searchBarContainer: {
+    borderRadius: 30
+  },
+  searchBarInputContainer: {
+    borderRadius: 30
   },
   list: {
     display: "flex",
@@ -136,16 +125,6 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%"
   },
-  input: {
-    display: "flex",
-    height: 50,
-    alignItems: "center",
-    marginTop: 40,
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    gap: 20
-  },
   buttons: {
     position: "absolute",
     bottom: 60,
@@ -153,6 +132,9 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 20
+  },
+  button: {
     gap: 20
   }
 });

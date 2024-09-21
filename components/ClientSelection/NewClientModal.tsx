@@ -3,31 +3,28 @@ import { StyleSheet, View } from "react-native";
 import { Button, Dialog, PanningProvider, TextField } from "react-native-ui-lib";
 import { Text } from "@rneui/base";
 import { AntDesign } from "@expo/vector-icons";
-import useMoveOnKeyboardOpen from "@/lib/hooks/useMoveOnKeyboardOpen";
+import useMoveOnKeyboardOpen from "@/lib/hooks/useMoveOnKeyboardOpen"; //TODO: this could probably be shared and reduced with Client type
 
+//TODO: this could probably be shared and reduced with Client type
 type ClientProps = {
-  name: string;
+  business_name: string;
   email: string;
   abn: string;
   address: string;
 };
 
-const NewClientModal = ({
-  isVisible,
-  onClose,
-  onSaveClient
-}: {
+type Props = {
   isVisible: boolean;
   onClose: () => void;
   onSaveClient: (props: ClientProps) => void;
-}) => {
+};
+
+const NewClientModal = ({ isVisible, onClose, onSaveClient }: Props) => {
   const { bottom } = useMoveOnKeyboardOpen();
-  const [clientInfo, setClientInfo] = useState<ClientProps>({
-    name: "",
-    email: "",
-    abn: "",
-    address: ""
-  });
+  const [clientInfo, setClientInfo] = useState<ClientProps>({ business_name: "", email: "", abn: "", address: "" });
+  const isButtonDisabled = Object.values(clientInfo).some((value) => value === "");
+
+  const onChange = (property: string) => (value: string) => setClientInfo({ ...clientInfo, [property]: value });
 
   return (
     <View>
@@ -38,50 +35,42 @@ const NewClientModal = ({
         panDirection={PanningProvider.Directions.DOWN}
         useSafeArea
       >
-        <Text style={{ fontWeight: "bold", fontSize: 30, paddingBottom: 40 }}>Add new client</Text>
+        <Text style={styles.title}>Add new client</Text>
         <View style={styles.info}>
           <TextField
-            fieldStyle={{ borderBottomWidth: 1, borderBottomColor: "black" }}
+            fieldStyle={styles.field}
             label={"Business Name"}
-            value={clientInfo.name}
-            onChangeText={(value: string) => setClientInfo({ ...clientInfo, name: value })}
+            value={clientInfo.business_name}
+            onChangeText={onChange("business_name")}
           />
           <TextField
             validate={["email"]}
             value={clientInfo.email}
-            fieldStyle={{ borderBottomWidth: 1, borderBottomColor: "black" }}
+            fieldStyle={styles.field}
             label={"Email"}
-            onChangeText={(value: string) => setClientInfo({ ...clientInfo, email: value })}
+            onChangeText={onChange("email")}
           />
           <TextField
+            validate={["number"]}
             value={clientInfo.abn}
-            fieldStyle={{ borderBottomWidth: 1, borderBottomColor: "black" }}
+            fieldStyle={styles.field}
             label={"ABN"}
-            onChangeText={(value: string) => setClientInfo({ ...clientInfo, abn: value })}
+            onChangeText={onChange("abn")}
           />
           <TextField
             value={clientInfo.address}
-            fieldStyle={{ borderBottomWidth: 1, borderBottomColor: "black" }}
+            fieldStyle={styles.field}
             label={"Address"}
-            onChangeText={(value: string) => setClientInfo({ ...clientInfo, address: value })}
+            onChangeText={onChange("address")}
           />
         </View>
-        <View
-          style={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "flex-end",
-            paddingTop: 30
-          }}
-        >
+        <View style={styles.buttonContainer}>
           <Button
+            style={{ paddingLeft: 25 }}
             label={"Save"}
             iconOnRight={true}
-            disabled={
-              clientInfo.name === "" || clientInfo.email === "" || clientInfo.abn === "" || clientInfo.address === ""
-            }
-            iconSource={() => <AntDesign style={{ paddingLeft: 10 }} name="check" size={20} color="white" />}
+            disabled={isButtonDisabled}
+            iconSource={() => <AntDesign style={{ paddingLeft: 5 }} name="check" size={20} color="white" />}
             onPress={() => onSaveClient(clientInfo)}
           />
         </View>
@@ -101,7 +90,16 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     gap: 40
-  }
+  },
+  buttonContainer: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    paddingTop: 30
+  },
+  field: { borderBottomWidth: 1, borderBottomColor: "black" },
+  title: { fontWeight: "bold", fontSize: 30, paddingBottom: 40 }
 });
 
 export default NewClientModal;
