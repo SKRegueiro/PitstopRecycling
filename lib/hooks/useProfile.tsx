@@ -1,18 +1,18 @@
-import { Alert } from "react-native";
 import getCurrentUserProfile from "@/services/auth/getCurrentUserProfile";
 import { useQuery } from "@tanstack/react-query";
 import useSession from "@/lib/hooks/useSession";
 import QueryKeys from "@/constants/QueryKeys";
+import { ToastError } from "@/lib/utils/Toasts";
 
 type Props = {
   isLoading: boolean;
-  profile: {
+  profile?: {
     created_at: string;
-    email: string;
+    email: string | null;
     id: number;
-    name: string;
-    type: "Driver" | "Admin" | "Customer";
-  };
+    name: string | null;
+    type: string | null;
+  } | null;
 };
 
 const useProfile = (): Props => {
@@ -25,12 +25,13 @@ const useProfile = (): Props => {
   });
 
   if (isError) {
-    console.log(error);
-    Alert.alert(error.message);
+    ToastError(error.message);
   }
 
-  //TODO: fix this
-  return { isLoading: isSessionLoading || isLoading, profile: data?.data };
+  return {
+    isLoading: isSessionLoading || isLoading,
+    profile: session && data?.data ? data?.data : undefined
+  };
 };
 
 export default useProfile;

@@ -6,6 +6,7 @@ import useProfile from "@/lib/hooks/useProfile";
 export default function Index() {
   const { isLoading, profile } = useProfile();
 
+  //TODO: implement RN Reanimated to add some cool animations
   if (isLoading) {
     return null;
   }
@@ -20,5 +21,3 @@ export default function Index() {
 
   return null;
 }
-// TS2322: Type '{ created_at: string; email: string | null; id: number; name: string | null; type: string | null; } | null | undefined' is not assignable to type '{ created_at: string; email: string; id: number; name: string; type: "Driver" | "Admin" | "Customer"; }'.
-//     Type 'undefined' is not assignable to type '{ created_at: string; email: string; id: number; name: string; type: "Driver" | "Admin" | "Customer"; }'.

@@ -10,9 +10,9 @@ import StatsCard from "@/components/StatCard";
 type Props = {
   profile: {
     created_at: string;
-    email: string;
-    name: string;
-    type: string;
+    email: string | null;
+    name: string | null;
+    type: string | null;
   };
 };
 
@@ -33,8 +33,9 @@ export default function Home({ profile }: Props) {
     <View style={styles.container} useSafeArea>
       <Stack.Screen
         options={{
-          title: "Home",
-          headerRight: () => <FontAwesome5 name="clock" size={24} color="black" />
+          title: "Home"
+          // TODO: add schedule feature
+          // headerRight: () => <FontAwesome5 name="clock" size={24} color="black" />
         }}
       />
       <StatsCard

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Alert, AppState, StyleSheet, View } from "react-native";
-import { supabase } from "../lib/supabase";
-import { Button, Input } from "@rneui/themed";
+import { AppState, StyleSheet, View } from "react-native";
+import { supabase } from "@/lib/supabase";
+import { Button, ButtonSize } from "react-native-ui-lib";
 import signInWithEmail from "@/services/auth/signInWithEmail";
 import signUpWithEmail from "@/services/auth/signUpWithEmail";
+import { Input } from "@rneui/themed";
+import { ToastError, ToastSuccess } from "@/lib/utils/Toasts";
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
@@ -22,11 +24,13 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const buttonDisabled = !email || !password || loading;
+
   async function signIn() {
     setLoading(true);
-    const { error, data } = await signInWithEmail(email, password);
+    const { error } = await signInWithEmail(email, password);
 
-    if (error) Alert.alert(error.message);
+    if (error) ToastError(error.message);
     setLoading(false);
   }
 
@@ -34,8 +38,8 @@ export default function Auth() {
     setLoading(true);
     const { data, error } = await signUpWithEmail(email, password);
 
-    if (error) Alert.alert(error.message);
-    if (!data.session) Alert.alert("Please check your inbox for email verification!");
+    if (error) ToastError(error.message);
+    if (!data.session) ToastSuccess("Please check your inbox for email verification!");
     setLoading(false);
   }
 
@@ -63,10 +67,26 @@ export default function Auth() {
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button title="Sign in" disabled={loading} onPress={() => signIn()} />
+        <Button
+          onPress={signIn}
+          label={"Sign in"}
+          size={ButtonSize.large}
+          style={styles.fullWidthButton}
+          enableShadow
+          borderRadius={5}
+          disabled={buttonDisabled}
+        />
       </View>
       <View style={styles.verticallySpaced}>
-        <Button title="Sign up" disabled={loading} onPress={() => signUp()} />
+        <Button
+          onPress={signUp}
+          label={"Sign up"}
+          size={ButtonSize.large}
+          style={styles.fullWidthButton}
+          enableShadow
+          borderRadius={5}
+          disabled={buttonDisabled}
+        />
       </View>
     </View>
   );
@@ -84,5 +104,9 @@ const styles = StyleSheet.create({
   },
   mt20: {
     marginTop: 20
+  },
+  fullWidthButton: {
+    width: "100%",
+    height: 80
   }
 });
