@@ -43,7 +43,7 @@ type Body = {
 //TODO: add authorization check. Store the invoice
 const handler = async (request: Request): Promise<Response> => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    // global: { headers: { Authorization: request.headers.get("Authorization")! } }
+    global: { headers: { Authorization: request.headers.get("Authorization") } }
   });
   const pickUp: Body = await request.json();
 
