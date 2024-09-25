@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { Stack } from "expo-router";
 import { ListItem, Text } from "react-native-ui-lib";
 import LoadingModal from "@/components/LoadingModal";
-import { usePickUpContext } from "@/app/(app)/(pickUp)/_layout";
+import { usePickUpContext } from "@/app/(authorized)/(pickUp)/_layout";
 
 const Signature = () => {
   const ref = useRef<SignatureViewRef>(null);

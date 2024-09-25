@@ -1,4 +1,4 @@
-import { usePickUpContext } from "@/app/(app)/(pickUp)/_layout";
+import { usePickUpContext } from "@/app/(authorized)/(pickUp)/_layout";
 import useGetClients from "@/lib/hooks/useGetClients";
 import { useState } from "react";
 import Client from "@/types/Client";

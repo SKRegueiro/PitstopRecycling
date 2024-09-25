@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { router, Stack } from "expo-router";
 import useMoveOnKeyboardOpen from "@/lib/hooks/useMoveOnKeyboardOpen";
 import { AntDesign } from "@expo/vector-icons";
-import { usePickUpContext } from "@/app/(app)/(pickUp)/_layout";
+import { usePickUpContext } from "@/app/(authorized)/(pickUp)/_layout";
 import Routes from "@/constants/Routes";
 
 const Input = () => {
