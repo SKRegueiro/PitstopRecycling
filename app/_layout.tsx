@@ -18,16 +18,15 @@ export { ErrorBoundary } from "expo-router";
 // initialRouteName: "map"
 // };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+const RootLayout = () => {
+  // const colorScheme = useColorScheme();
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -42,11 +41,6 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
-  // const colorScheme = useColorScheme();
   return (
     <GestureHandlerRootView>
       <QueryClientProvider client={queryClient}>
@@ -78,4 +72,6 @@ function RootLayoutNav() {
       </QueryClientProvider>
     </GestureHandlerRootView>
   );
-}
+};
+
+export default RootLayout;
