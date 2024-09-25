@@ -1,24 +1,19 @@
-import { StyleSheet } from "react-native";
 import React, { useCallback } from "react";
+import { StyleSheet } from "react-native";
 import { Button, ButtonSize, View } from "react-native-ui-lib";
 import { router, Stack, useFocusEffect } from "expo-router";
 import { FontAwesome5, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import useInTransitPickUps from "@/lib/hooks/useInTransitPickUps";
 import Routes from "@/constants/Routes";
 import StatsCard from "@/components/StatCard";
+import useProfile from "@/lib/hooks/useProfile";
+import signOut from "@/services/auth/signOut";
 
-type Props = {
-  profile: {
-    created_at: string;
-    email: string | null;
-    name: string | null;
-    type: string | null;
-  };
-};
-
-export default function Home({ profile }: Props) {
+const Home = () => {
+  const { profile } = useProfile();
   const { haveInTransitPickUps, tyresByType, refetch, isLoading } = useInTransitPickUps();
 
+  //TODO: fetch not working when opening app
   useFocusEffect(
     useCallback(() => {
       refetch();
@@ -27,8 +22,7 @@ export default function Home({ profile }: Props) {
 
   const goToDropOff = () => router.navigate(Routes.DropOff);
   const goToFuel = () => router.navigate(Routes.Fuel);
-  // const goToPickUp = () => router.navigate(Routes.PickUp);
-  const goToPickUp = () => router.navigate("/tyres");
+  const goToPickUp = () => router.navigate(Routes.Input);
 
   return (
     <View style={styles.container} useSafeArea>
@@ -45,6 +39,7 @@ export default function Home({ profile }: Props) {
         haveInTransitPickUps={haveInTransitPickUps}
         tyresByType={tyresByType}
       />
+      <Button label={"sign out"} onPress={signOut} />
 
       <View style={styles.buttons}>
         <View style={styles.buttonRow}>
@@ -82,7 +77,7 @@ export default function Home({ profile }: Props) {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -113,3 +108,5 @@ const styles = StyleSheet.create({
     marginRight: 10
   }
 });
+
+export default Home;

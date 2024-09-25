@@ -9,7 +9,7 @@ import Routes from "@/constants/Routes";
 import { ToastError, ToastSuccess } from "@/lib/utils/Toasts";
 import ScreenView from "@/components/ScreenView";
 
-const dropOffView = () => {
+const dropOff = () => {
   const { sites } = useSites();
   const { pickUps, refetch } = useInTransitPickUps();
 
@@ -72,4 +72,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default dropOffView;
+export default dropOff;

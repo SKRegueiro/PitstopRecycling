@@ -1,20 +1,15 @@
-import { FlatList, Keyboard, Platform, StyleSheet } from "react-native";
-import { Text, View } from "@/components/Themed";
+import { FlatList, Keyboard, Platform, StyleSheet, Text, View } from "react-native";
 import { Button, Picker, TextField } from "react-native-ui-lib";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import useMoveOnKeyboardOpen from "@/lib/hooks/useMoveOnKeyboardOpen";
 import { AntDesign } from "@expo/vector-icons";
-import Tyre from "@/types/Tyre";
+import { usePickUpContext } from "@/app/(app)/(pickUp)/_layout";
+import Routes from "@/constants/Routes";
 
-type Props = {
-  tyres: Tyre[];
-  onTyresChange: (value: Tyre[]) => void;
-  goNext: () => void;
-};
-
-export default function InputTyres({ tyres, onTyresChange, goNext }: Props) {
+const Input = () => {
+  const { tyres, setTyres } = usePickUpContext();
   const [tireQuantity, setTireQuantity] = useState<string>("");
   const [tireType, setTireType] = useState<string>("Passenger");
   const { bottom } = useMoveOnKeyboardOpen();
@@ -29,11 +24,11 @@ export default function InputTyres({ tyres, onTyresChange, goNext }: Props) {
       updatedTyres[existingTyreIndex].quantity =
         Number(updatedTyres[existingTyreIndex].quantity) + parseInt(tireQuantity);
 
-      onTyresChange(updatedTyres);
+      setTyres(updatedTyres);
     } else {
       const newTyre = { id: tyres.length + 1, quantity: parseInt(tireQuantity), type: tireType };
 
-      onTyresChange([...tyres, newTyre]);
+      setTyres([...tyres, newTyre]);
     }
 
     setTireQuantity("");
@@ -41,8 +36,10 @@ export default function InputTyres({ tyres, onTyresChange, goNext }: Props) {
   };
 
   const onRemoveItem = (id: number) => {
-    onTyresChange(tyres.filter((item) => item.id !== id));
+    setTyres(tyres.filter((item) => item.id !== id));
   };
+
+  const goNext = () => router.push(Routes.Clients);
 
   return (
     <View style={[styles.container, { bottom }]}>
@@ -105,7 +102,7 @@ export default function InputTyres({ tyres, onTyresChange, goNext }: Props) {
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
     </View>
   );
-}
+};
 
 const Item = ({
   id,
@@ -192,3 +189,5 @@ const styles = StyleSheet.create({
     right: 20
   }
 });
+
+export default Input;

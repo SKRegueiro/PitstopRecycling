@@ -4,21 +4,14 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { Stack } from "expo-router";
 import { ListItem, Text } from "react-native-ui-lib";
 import LoadingModal from "@/components/LoadingModal";
-import Client from "@/types/Client";
-import Tyre from "@/types/Tyre";
+import { usePickUpContext } from "@/app/(app)/(pickUp)/_layout";
 
-interface Props {
-  client: Client;
-  onOK: (signature: string) => void;
-  tyres: Tyre[];
-  isLoading: boolean;
-}
-
-const Sign = ({ client, onOK, tyres, isLoading }: Props) => {
+const Signature = () => {
   const ref = useRef<SignatureViewRef>(null);
   const [scrollEnabled, setScrollEnabled] = useState(true);
+  const { client, tyres, loading, onSubmit } = usePickUpContext();
 
-  const handleSubmit = (signature: any) => onOK(signature);
+  const handleSubmit = (signature: string) => onSubmit(signature);
 
   return (
     <ScrollView contentInset={{ bottom: 100 }} scrollEnabled={scrollEnabled} contentContainerStyle={styles.container}>
@@ -33,7 +26,7 @@ const Sign = ({ client, onOK, tyres, isLoading }: Props) => {
       />
       <View style={styles.textContainer}>
         <Text text40R>Client:</Text>
-        <Text text80R>{client.business_name}</Text>
+        <Text text80R>{client?.business_name}</Text>
       </View>
       <View>
         <Text text40R style={styles.textContainer}>
@@ -60,7 +53,7 @@ const Sign = ({ client, onOK, tyres, isLoading }: Props) => {
         webviewContainerStyle={styles.signatureContainer}
         backgroundColor="transparent"
       />
-      <LoadingModal isLoading={isLoading} />
+      <LoadingModal isLoading={loading} />
     </ScrollView>
   );
 };
@@ -100,4 +93,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Sign;
+export default Signature;

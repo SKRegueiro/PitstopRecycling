@@ -1,23 +1,19 @@
-import { FlatList, StyleSheet, View } from "react-native";
-import React, { useState } from "react";
-import { SearchBar, Text } from "@rneui/base";
+import { usePickUpContext } from "@/app/(app)/(pickUp)/_layout";
 import useGetClients from "@/lib/hooks/useGetClients";
-import { Button } from "react-native-ui-lib";
-import { Stack } from "expo-router";
-import NewClientModal from "@/components/ClientSelection/NewClientModal";
-import Colors from "@/constants/Colors";
+import { useState } from "react";
 import Client from "@/types/Client";
-import Item from "@/components/ClientSelection/Item";
 import useSaveNewClient from "@/lib/hooks/useSaveNewClient";
+import { Button, Text, View } from "react-native-ui-lib";
+import Colors from "@/constants/Colors";
+import { FlatList, StyleSheet } from "react-native";
+import { SearchBar } from "@rneui/base";
+import Item from "@/components/Item";
+import { router, Stack } from "expo-router";
+import NewClientModal from "@/components/NewClientModal";
+import Routes from "@/constants/Routes";
 
-type Props = {
-  onBack: () => void;
-  onNext: () => void;
-  selectedClientId: number | undefined;
-  onSelectClient: (client?: Client) => void;
-};
-
-const ClientSelection = ({ onBack, onNext, selectedClientId, onSelectClient }: Props) => {
+const Clients = () => {
+  const { client, setClient } = usePickUpContext();
   const { isLoading, clients } = useGetClients();
   const [searchedName, setSearchedName] = useState<string>("");
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
@@ -33,17 +29,17 @@ const ClientSelection = ({ onBack, onNext, selectedClientId, onSelectClient }: P
     const { newClient } = await saveNewClient(selectedClientData);
 
     if (newClient) {
-      onSelectClient(newClient);
+      setClient(newClient);
       setShowModal(false);
-      onNext();
+      goNext();
     }
   };
 
   const onSelect = (id: number) => {
-    if (selectedClientId === id) {
-      onSelectClient(undefined);
+    if (client?.id === id) {
+      setClient(undefined);
     } else {
-      onSelectClient(clients?.find((client) => client.id === id));
+      setClient(clients?.find((client) => client.id === id));
     }
   };
 
@@ -54,6 +50,9 @@ const ClientSelection = ({ onBack, onNext, selectedClientId, onSelectClient }: P
     setSearchedName(searchedName);
     setFilteredClients(filteredClients);
   };
+
+  const goNext = () => router.push(Routes.Signature);
+  const goBack = () => router.back();
 
   return (
     <View style={styles.container}>
@@ -78,19 +77,18 @@ const ClientSelection = ({ onBack, onNext, selectedClientId, onSelectClient }: P
         onChangeText={onSearch}
       />
       {isLoading ? (
-        // improve this
         <Text>Loading...</Text>
       ) : (
         <FlatList
           style={styles.list}
           data={searchedName.length > 0 ? filteredClients : clients}
-          renderItem={({ item }) => <Item selectedId={selectedClientId} onSelect={onSelect} {...item} />}
+          renderItem={({ item }) => <Item selectedId={client?.id} onSelect={onSelect} {...item} />}
           keyExtractor={(item) => item.id.toString()}
         />
       )}
       <View style={styles.buttons}>
-        <Button style={styles.button} enableShadow round label={"<"} onPress={onBack} />
-        <Button style={styles.button} disabled={!selectedClientId} enableShadow round label={">"} onPress={onNext} />
+        <Button style={styles.button} enableShadow round label={"<"} onPress={goBack} />
+        <Button style={styles.button} disabled={!client} enableShadow round label={">"} onPress={goNext} />
       </View>
 
       <NewClientModal isVisible={showModal} onClose={() => setShowModal(false)} onSaveClient={onSaveClient} />
@@ -139,4 +137,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default ClientSelection;
+export default Clients;

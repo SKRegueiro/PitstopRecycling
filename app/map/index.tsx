@@ -1,5 +1,4 @@
-import { StyleSheet } from "react-native";
-import { Text, View } from "@/components/Themed";
+import { StyleSheet, Text, View } from "react-native";
 import { useState } from "react";
 import MapView, { Marker } from "react-native-maps";
 

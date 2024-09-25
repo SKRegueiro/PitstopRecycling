@@ -14,7 +14,7 @@ import { ToastError, ToastSuccess } from "@/lib/utils/Toasts";
 import ScreenView from "@/components/ScreenView";
 import LoadingModal from "@/components/LoadingModal";
 
-const FuelView = () => {
+const Fuel = () => {
   const cameraRef = useRef<CameraView | null>(null);
   const { uploadFuel, loading } = useUploadFuel();
   const { profile } = useProfile();
@@ -24,7 +24,6 @@ const FuelView = () => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [picture, setPicture] = useState<CameraCapturedPicture | undefined>(undefined);
 
-  //TODO: Secure bucket
   const onSubmit = async () => {
     try {
       await uploadFuel({ amount, date, base64: picture?.base64, userId: profile?.id.toString() });
@@ -170,4 +169,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default FuelView;
+export default Fuel;

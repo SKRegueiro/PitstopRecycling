@@ -6,6 +6,8 @@ import signInWithEmail from "@/services/auth/signInWithEmail";
 import signUpWithEmail from "@/services/auth/signUpWithEmail";
 import { Input } from "@rneui/themed";
 import { ToastError, ToastSuccess } from "@/lib/utils/Toasts";
+import { router } from "expo-router";
+import Routes from "@/constants/Routes";
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
@@ -30,7 +32,11 @@ export default function Auth() {
     setLoading(true);
     const { error } = await signInWithEmail(email, password);
 
-    if (error) ToastError(error.message);
+    if (error) {
+      ToastError(error.message);
+    } else {
+      router.navigate(Routes.Home);
+    }
     setLoading(false);
   }
 
