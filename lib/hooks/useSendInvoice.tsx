@@ -7,18 +7,21 @@ import sendEmail from "@/services/pickups/sendEmail";
 import { router } from "expo-router";
 import Routes from "@/constants/Routes";
 import Tyre from "@/types/Tyre";
+import useSession from "@/lib/hooks/useSession";
 
 type Props = {
   //TODO: improve type
   client: any;
   tyres: Tyre[];
-  signature: ArrayBuffer;
+  signature: string;
+  accessToken?: string;
 };
 
 const useSendInvoice = () => {
   const { profile } = useProfile();
   const [loading, setLoading] = useState(false);
   const { refetch } = useInTransitPickUps();
+  const { session } = useSession();
 
   const sendInvoice = async ({ client, tyres, signature }: Props) => {
     try {
@@ -37,11 +40,13 @@ const useSendInvoice = () => {
         tyres: tyres,
         clientId: client.id,
         clients: { ...client },
-        signature
+        signature,
+        accessToken: session?.access_token
       });
 
       if (emailResult.status === 200) {
         ToastSuccess("Pick up successfully created ✅");
+        await refetch();
         router.navigate(Routes.Home);
       } else if (emailResult.status === 500) {
         return ToastError("Email failed to send. Please try again.");
@@ -50,16 +55,12 @@ const useSendInvoice = () => {
       } else {
         return ToastError("An unexpected error occurred while sending the email.");
       }
-      await refetch();
-      router.navigate(Routes.Home);
     } catch (error) {
       console.log(error);
 
       if (error instanceof Error) {
         ToastError(error.message);
       }
-    } finally {
-      setLoading(false);
     }
   };
 

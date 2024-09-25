@@ -16,10 +16,10 @@ const PickUpView = () => {
   const [currentPage, setCurrentPage] = useState(TYRE_PAGE);
   const { loading, sendInvoice } = useSendInvoice();
 
-  //TODO: improve type
-  const onSubmit = async (signature: any) => {
+  const onSubmit = async (signature: string) => {
     await sendInvoice({ client, tyres, signature });
   };
+
   const goNext = () => setCurrentPage(currentPage + 1);
   const goBack = () => setCurrentPage(currentPage - 1);
 

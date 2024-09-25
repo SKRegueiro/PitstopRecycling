@@ -1,7 +1,6 @@
 // @ts-ignore
-import { createClient } from "jsr:@supabase/supabase-js@2";
-// @ts-ignore
-import { PDFDocument } from "https://cdn.pika.dev/pdf-lib@^1.7.0";
+import { createClient } from "jsr:@supabase/supabase-js@2"; // @ts-ignore
+import { PDFDocument } from "https://cdn.pika.dev/pdf-lib@^1.7.0"; // @ts-ignore
 
 // @ts-ignore
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
@@ -50,7 +49,15 @@ const handler = async (request: Request): Promise<Response> => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     global: { headers: { Authorization: request.headers.get("Authorization") } }
   });
-  console.log(supabase);
+  const authHeader = request.headers.get("Authorization")!;
+  const token = authHeader.replace("Bearer ", "");
+  const { data } = await supabase.auth.getUser(token);
+  const user = data.user;
+
+  if (user?.aud !== "authenticated") {
+    console.log("unauthorized");
+    return new Response("You need to be authenticated", { status: 401 });
+  }
   const pickUp: Body = await request.json();
 
   try {

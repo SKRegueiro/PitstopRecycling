@@ -12,7 +12,8 @@ type Props = {
     signer_names: string[];
     business_name: string;
   };
-  signature: ArrayBuffer;
+  signature: string;
+  accessToken?: string;
 };
 
 const sendEmail = (body: Props) => {
@@ -20,7 +21,8 @@ const sendEmail = (body: Props) => {
   return fetch("https://yheytbqqhcmmeyhkbhim.supabase.co/functions/v1/resend", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${body.accessToken}`
     },
     body: JSON.stringify({
       created_at: new Date().toISOString(),
