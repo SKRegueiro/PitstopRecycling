@@ -60,6 +60,10 @@ function RootLayoutNav() {
                 options={{ headerShown: true, headerBackTitle: "Cancel", headerTitle: "Pick Up" }}
               />
               <Stack.Screen
+                name="(pickUp)/tyres"
+                options={{ headerShown: true, headerBackTitle: "Cancel", headerTitle: "Pick Up" }}
+              />
+              <Stack.Screen
                 name="fuelView"
                 options={{ headerShown: true, headerBackTitle: "Back", title: "Fuel Log" }}
               />

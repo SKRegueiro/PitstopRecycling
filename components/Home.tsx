@@ -27,7 +27,8 @@ export default function Home({ profile }: Props) {
 
   const goToDropOff = () => router.navigate(Routes.DropOff);
   const goToFuel = () => router.navigate(Routes.Fuel);
-  const goToPickUp = () => router.navigate(Routes.PickUp);
+  // const goToPickUp = () => router.navigate(Routes.PickUp);
+  const goToPickUp = () => router.navigate("/tyres");
 
   return (
     <View style={styles.container} useSafeArea>
