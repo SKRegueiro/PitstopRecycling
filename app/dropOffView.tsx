@@ -11,17 +11,19 @@ import ScreenView from "@/components/ScreenView";
 
 const dropOffView = () => {
   const { sites } = useSites();
-  const { pickUps } = useInTransitPickUps();
+  const { pickUps, refetch } = useInTransitPickUps();
 
   const onSelect = async (siteId: number) => {
     const ids = pickUps?.map((pickUp) => pickUp.id);
     const { error } = await dropPickUps({ pickUpIds: ids || [], siteId });
+
     if (!error) {
       router.navigate(Routes.Home);
       ToastSuccess("Load dropped successfully");
     } else {
       ToastError("There was an error. Please try again later");
     }
+    refetch();
   };
 
   return (

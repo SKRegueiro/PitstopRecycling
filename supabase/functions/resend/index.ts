@@ -1,8 +1,13 @@
+// @ts-ignore
 import { createClient } from "jsr:@supabase/supabase-js@2";
+// @ts-ignore
 import { PDFDocument } from "https://cdn.pika.dev/pdf-lib@^1.7.0";
 
+// @ts-ignore
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+// @ts-ignore
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+// @ts-ignore
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY");
 const PITSTOP_DATA = {
   name: "PITSTOP PTY LTD",
@@ -45,6 +50,7 @@ const handler = async (request: Request): Promise<Response> => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     global: { headers: { Authorization: request.headers.get("Authorization") } }
   });
+  console.log(supabase);
   const pickUp: Body = await request.json();
 
   try {
@@ -285,4 +291,5 @@ async function createPdf(invoiceData: InvoiceData, signatureArrayBuffer: ArrayBu
   }
 }
 
+// @ts-ignore
 Deno.serve(handler);
