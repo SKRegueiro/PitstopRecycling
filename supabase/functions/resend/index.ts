@@ -1,6 +1,7 @@
 // @ts-ignore
-import { createClient } from "jsr:@supabase/supabase-js@2"; // @ts-ignore
-import { PDFDocument } from "https://cdn.pika.dev/pdf-lib@^1.7.0"; // @ts-ignore
+import { createClient } from "jsr:@supabase/supabase-js@2";
+// @ts-ignore
+import { PDFDocument } from "https://cdn.pika.dev/pdf-lib@^1.7.0";
 
 // @ts-ignore
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
@@ -44,7 +45,7 @@ type Body = {
   signature: ArrayBuffer;
 };
 
-//TODO: add authorization check. Store the invoice
+//TODO: Store the invoice
 const handler = async (request: Request): Promise<Response> => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     global: { headers: { Authorization: request.headers.get("Authorization") } }

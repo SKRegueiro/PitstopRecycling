@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { Button, Dialog, PanningProvider, TextField } from "react-native-ui-lib";
 import { Text } from "@rneui/base";
 import { AntDesign } from "@expo/vector-icons";
-import useMoveOnKeyboardOpen from "@/lib/hooks/useMoveOnKeyboardOpen"; //TODO: this could probably be shared and reduced with Client type
+import useMoveOnKeyboardOpen from "@/lib/hooks/useMoveOnKeyboardOpen";
 
 //TODO: this could probably be shared and reduced with Client type
 type ClientProps = {
