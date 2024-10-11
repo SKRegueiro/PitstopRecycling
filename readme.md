@@ -1,43 +1,18 @@
 ## Pitstop Recycling
-
 ### Overview
+This is a tool application that I built to assist me in the tyre pick-up and return process. It was never intended to be shown to the public, so the code is full of TODOs, secrets that need to be extracted into the environment variables, and features pending implementation. The primary objective was to get it functional as quickly as possible.
 
-This is a tool application that I build to assist me in a user tyres pick up and return process.
-never intended to be shown to the public so the code is full of TODOs, secrets to be extracted to the env, and things
-pending to be implemented since the objective was to get it out and functional as soon as possible.
+The main goal of this application was to automate and standardize the process of picking up tyres from customers, automatically sending invoices, and keeping track of stock. The manual process involved arriving at the customer's store, picking up the used tyres, recording how many tyres we collected and of what type in an order book, making the customer sign, and then sending a picture of it to my boss so he could create the invoice and send it to the customer.
 
-The main goal of this application was to automate and standardize the process of picking up tyres from the customes,
-automatically send invoices and keep track of the stock. The manual process consisted on arriving at the customer store,
-pick up the used tyres, input in an order book how many tyres we got and of what type, make the customer sign and then
-send a picture of it to my boss so he can create the invoice and send it to the customer.
+While simple, this process had several glaring issues:
 
-This process, while simple, had a lot of glaring issues:
-
-- We depended on our boss to have a computer close so he could create and send the invoice so the customer could pay.
-  This was not always the case, and this need kept him away from spending time on getting more clients.
-- We had to manually input the tyres in the order book, and after picking up tyres full of rain water inside, the notes
-  were not clear enough to be read so we had to go back and forth with text messages while driving to the next customer,
-  which was pretty dangerous.
-- Lack of metrics. Since the process was completely manual, we were in the dark about important metrics like how many
-  tyres we got, how much distance we needed to drive to make the trip worth it, at what rate each client were producing
-  new tyres to be picked up and approximately how much time needed to pass to come back for more. This led to
-  unproductive way of conducting the business.
-
-This app aimed to solve those problems while giving certain structure to the business. Other feature like controlling
-how many hours we work, how much we spent on fuel, and controlling where each driver is currently located, were also
-thought of, to make this app a complete solution for this business, but they were not made since it was decided not to
-invest on it.
+We depended on our boss having access to a computer to create and send the invoice so the customer could pay. This was not always the case, and this requirement often prevented him from focusing on acquiring new clients.
+We had to manually input the tyres into the order book, and after picking up tyres full of rainwater, the notes were often unclear, forcing us to go back and forth with text messages while driving to the next customer—something that was quite dangerous.
+There was a lack of metrics. Since the process was entirely manual, we had no visibility into important data like how many tyres we collected, the distance required to make each trip worthwhile, the rate at which each client produced new tyres for pickup, and how much time needed to pass before a return visit was necessary. This led to an unproductive way of conducting business.
+This app was designed to address these issues while providing some structure to the business. Other features, such as tracking hours worked, fuel expenses, and the location of each driver, were considered to make the app a comprehensive solution for this business. However, these features were not implemented as it was decided not to invest further in the app.
 
 ### Technologies
+The application is built with React Native and TypeScript on the frontend, and Supabase on the backend, where a database and a small edge function are hosted. The function is located in this repo inside the supabase/functions/resend/ folder. For styling and UI, we used Tailwind. Other libraries include those for data fetching and Resend for email sending.
 
-The application is build with React native and typescript in the frontend and supabase as the backend, where a DB and a
-small edge function are hosted. Said function is included in this repo inside supabase/functions/resend/ folder. For the
-styling and UI we used and tailwind. Other libraries used are for data fetching and resend for email sending.
-
-### Installation
-
-Clone the repo into your local machine and install the dependencies. You need to have XCode installed on your machine or
-an iphone with the expo app installed (I haven't tested it on android so I am not sure if it works). Start the app by
-running `yarn start` or `npm start` in the root folder and press "i" to run on the iphone emulator. Alternatively, you
-can
-scan the QR code to open it on your phone.
+### Installation 
+Clone the repo to your local machine and install the dependencies. You need to have Xcode installed on your machine or an iPhone with the Expo app installed (I haven't tested it on Android, so I'm not sure if it works). Start the app by running yarn start or npm start in the root folder and press "i" to run it on the iPhone emulator. Alternatively, you can scan the QR code to open it on your phone.
